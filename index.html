@@ -3,196 +3,252 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AnálisisCual — Análisis Cualitativo sin IA</title>
+<title>AnalisisCuant — Análisis Cuantitativo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --navy:#1B2C4E;--navy-light:#2A3F6A;
-  --green:#2D8653;--green-pale:#EAF5EF;
-  --amber:#C07A1A;--amber-pale:#FDF3E3;
-  --slate:#6B7A8F;--slate-light:#8FA0B5;
-  --cream:#F8F7F4;--white:#FFFFFF;
-  --border:#E2E0DB;--border-dark:#C8C5BE;
-  --text:#1A1A1A;--text-secondary:#4A5568;--text-muted:#718096;
-  --red:#C53030;--red-pale:#FFF5F5;
-  --radius:10px;--radius-lg:16px;
+  --navy:#0F2040;--navy2:#1A3260;--navy3:#243F7A;
+  --teal:#1A8C7A;--teal-pale:#E6F5F2;--teal-mid:#2AAF99;
+  --indigo:#3D52B0;--indigo-pale:#EEF1FB;
+  --amber:#B86E00;--amber-pale:#FEF3E2;
+  --red:#C13030;--red-pale:#FEF0F0;
+  --green:#1F7A4A;--green-pale:#E8F5EE;
+  --slate:#5A6A7E;--slate-lt:#8899AA;
+  --border:#DDE1E8;--border2:#C8CDD6;
+  --bg:#F4F6FA;--white:#FFFFFF;
+  --text:#18202E;--text2:#44526A;--text3:#6B7A90;
+  --radius:8px;--radius-lg:14px;
+  --font:'Inter',sans-serif;
+  --mono:'JetBrains Mono',monospace;
 }
-html,body{height:100%;font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);font-size:15px;line-height:1.6}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
 
-/* LAYOUT */
-.app{display:grid;grid-template-columns:270px 1fr;grid-template-rows:60px 1fr;height:100vh;overflow:hidden}
-.topbar{grid-column:1/-1;background:var(--navy);display:flex;align-items:center;padding:0 24px;gap:16px;border-bottom:1px solid rgba(255,255,255,0.08)}
-.topbar-logo{display:flex;align-items:center;gap:10px}
-.topbar-title{font-size:16px;font-weight:600;color:#fff;letter-spacing:-0.01em}
-.topbar-sub{font-size:12px;color:rgba(255,255,255,0.45);margin-left:auto}
-.sidebar{background:var(--white);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;display:flex;flex-direction:column}
-.main{overflow-y:auto;padding:0;scroll-behavior:smooth}
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:260px 1fr;grid-template-rows:56px 1fr;height:100vh;overflow:hidden}
+.topbar{grid-column:1/-1;background:var(--navy);display:flex;align-items:center;padding:0 20px;gap:14px}
+.logo-mark{width:32px;height:32px;background:var(--teal);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{width:18px;height:18px}
+.app-name{font-size:15px;font-weight:600;color:#fff;letter-spacing:-0.01em}
+.app-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-left:auto}
+.mode-pills{display:flex;gap:6px;margin-left:auto}
+.mode-pill{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);background:transparent;transition:all .15s;font-family:var(--font)}
+.mode-pill.active{background:var(--teal);border-color:var(--teal);color:#fff}
 
-/* SIDEBAR */
-.sidebar-label{padding:0 16px 6px;font-size:10px;font-weight:600;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;margin-top:16px}
-.phase-btn{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:9px 16px;display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-secondary);transition:background 0.15s}
-.phase-btn:hover{background:var(--cream)}
-.phase-btn.active{background:var(--green-pale);color:var(--green);font-weight:500}
-.phase-btn.active .ph-num{background:var(--green);color:#fff}
-.phase-btn.done .ph-num{background:var(--navy);color:#fff}
-.ph-num{width:22px;height:22px;border-radius:50%;background:var(--border);color:var(--text-muted);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
-.ph-name{flex:1}
-.ph-check{font-size:11px;color:var(--green);opacity:0}
-.phase-btn.done .ph-check{opacity:1}
-.sidebar-footer{margin-top:auto;padding:16px;font-size:11px;color:var(--text-muted);line-height:1.6;border-top:1px solid var(--border)}
+.sidebar{background:var(--white);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;padding:16px 0}
+.main{overflow-y:auto;scroll-behavior:smooth}
 
-/* STEP TABS */
+/* ── SIDEBAR ── */
+.sb-section{padding:0 12px;margin-bottom:4px}
+.sb-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;padding:8px 6px 4px}
+.sb-btn{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:8px 10px;border-radius:var(--radius);display:flex;align-items:center;gap:9px;font-family:var(--font);font-size:13px;color:var(--text2);transition:all .12s}
+.sb-btn:hover{background:var(--bg)}
+.sb-btn.active{background:var(--teal-pale);color:var(--teal);font-weight:500}
+.sb-btn.active .sb-icon{background:var(--teal);color:#fff}
+.sb-icon{width:24px;height:24px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:var(--slate);transition:all .12s}
+.sb-divider{height:1px;background:var(--border);margin:10px 12px}
+.sb-footer{margin-top:auto;padding:14px 16px;font-size:11px;color:var(--text3);line-height:1.7;border-top:1px solid var(--border)}
+
+/* ── STEP TABS ── */
 .steps-nav{display:flex;border-bottom:1px solid var(--border);background:var(--white);position:sticky;top:0;z-index:10}
-.step-tab{flex:1;padding:14px 8px;text-align:center;font-size:12px;font-weight:500;color:var(--text-muted);border-bottom:2px solid transparent;cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;font-family:'Inter',sans-serif;transition:all 0.15s}
-.step-tab:hover{color:var(--navy);background:var(--cream)}
-.step-tab.active{color:var(--navy);border-bottom-color:var(--green);font-weight:600}
-.step-tab .step-n{display:block;font-size:18px;font-weight:600;margin-bottom:2px}
+.step-tab{flex:1;padding:12px 6px;text-align:center;font-size:11px;font-weight:500;color:var(--text3);border:none;border-bottom:2px solid transparent;cursor:pointer;background:none;font-family:var(--font);transition:all .13s}
+.step-tab:hover{color:var(--navy);background:var(--bg)}
+.step-tab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
+.step-n{display:block;font-size:20px;font-weight:600;margin-bottom:1px}
 
-/* PANELS */
-.panel{display:none;padding:28px 32px 40px}
+/* ── PANELS ── */
+.panel{display:none;padding:24px 28px 48px}
 .panel.active{display:block}
 
-/* TEMPLATE SECTION */
-.template-hero{background:var(--navy);border-radius:var(--radius-lg);padding:28px 32px;margin-bottom:28px;color:#fff}
-.template-hero h2{font-size:20px;font-weight:600;margin-bottom:8px}
-.template-hero p{font-size:14px;color:rgba(255,255,255,0.7);line-height:1.7;max-width:560px}
-.template-actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
-.btn-dl{padding:10px 20px;background:#fff;color:var(--navy);border:none;border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.15s}
-.btn-dl:hover{background:var(--green-pale);color:var(--green)}
-.btn-dl.secondary{background:rgba(255,255,255,0.12);color:#fff}
-.btn-dl.secondary:hover{background:rgba(255,255,255,0.2);color:#fff}
+/* ── SECTION HEADERS ── */
+.sec-head{font-size:16px;font-weight:600;color:var(--navy);margin-bottom:4px}
+.sec-sub{font-size:13px;color:var(--text3);margin-bottom:20px}
 
-.format-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
-.format-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:all 0.15s}
-.format-card:hover{border-color:var(--green)}
-.format-card.selected{border-color:var(--green);background:var(--green-pale)}
-.format-card-icon{font-size:28px;margin-bottom:10px}
-.format-card-title{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:4px}
-.format-card-desc{font-size:12px;color:var(--text-muted);line-height:1.6}
+/* ── MODE HERO ── */
+.mode-hero{border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:24px;display:flex;gap:20px;align-items:flex-start}
+.mode-hero.inv{background:linear-gradient(135deg,#0F2040 0%,#1A3260 100%)}
+.mode-hero.gen{background:linear-gradient(135deg,#0B3D35 0%,#1A6B5A 100%)}
+.mh-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.mh-icon.inv{background:rgba(61,82,176,0.3)}
+.mh-icon.gen{background:rgba(255,255,255,0.12)}
+.mh-title{font-size:16px;font-weight:600;color:#fff;margin-bottom:4px}
+.mh-desc{font-size:13px;color:rgba(255,255,255,0.65);line-height:1.65;max-width:480px}
 
-/* PREVIEW BOX */
-.preview-box{background:var(--navy);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px}
-.preview-header{padding:10px 16px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.2)}
-.preview-dot{width:10px;height:10px;border-radius:50%}
-.preview-title{font-size:12px;color:rgba(255,255,255,0.5);margin-left:4px}
-.preview-body{padding:20px 24px;font-family:'Courier New',monospace;font-size:12px;color:#a8d8a8;line-height:1.8;max-height:320px;overflow-y:auto;white-space:pre-wrap}
-.preview-comment{color:#6B8E6B}
-.preview-key{color:#FFD580}
-.preview-val{color:#a8d8a8}
+/* ── TEMPLATE CARDS ── */
+.tmpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+.tmpl-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:18px;cursor:pointer;transition:all .14s}
+.tmpl-card:hover{border-color:var(--teal)}
+.tmpl-card.sel{border-color:var(--teal);background:var(--teal-pale)}
+.tc-icon{font-size:24px;margin-bottom:8px}
+.tc-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px}
+.tc-desc{font-size:12px;color:var(--text3);line-height:1.55}
 
-/* UPLOAD SECTION */
-.upload-zone{border:2px dashed var(--border-dark);border-radius:var(--radius-lg);padding:48px 24px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--white);position:relative;margin-bottom:20px}
-.upload-zone:hover,.upload-zone.drag-over{border-color:var(--green);background:var(--green-pale)}
+/* ── CODE PREVIEW ── */
+.code-box{background:#0F1C2E;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:18px}
+.cb-header{padding:8px 14px;background:rgba(0,0,0,0.25);display:flex;align-items:center;gap:6px}
+.cb-dot{width:9px;height:9px;border-radius:50%}
+.cb-fname{font-size:11px;color:rgba(255,255,255,0.4);margin-left:4px;font-family:var(--mono)}
+.cb-body{padding:16px 20px;font-family:var(--mono);font-size:12px;color:#A8C8E8;line-height:1.9;max-height:300px;overflow-y:auto;white-space:pre-wrap}
+
+/* ── UPLOAD / INPUT ── */
+.input-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;width:fit-content}
+.itab{padding:8px 18px;font-size:12px;font-weight:500;cursor:pointer;background:var(--white);color:var(--text2);border:none;font-family:var(--font);transition:all .12s}
+.itab.active{background:var(--navy);color:#fff}
+
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:36px 24px;text-align:center;cursor:pointer;transition:all .18s;background:var(--white);position:relative;margin-bottom:14px}
+.upload-zone:hover,.upload-zone.dov{border-color:var(--teal);background:var(--teal-pale)}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-icon{font-size:40px;margin-bottom:12px;display:block}
-.upload-title{font-size:17px;font-weight:600;color:var(--navy);margin-bottom:6px}
-.upload-sub{font-size:13px;color:var(--text-muted)}
-.upload-formats{margin-top:12px;font-size:11px;color:var(--text-muted);background:var(--cream);padding:4px 14px;border-radius:20px;display:inline-block}
+.uz-icon{font-size:32px;margin-bottom:8px;display:block}
+.uz-title{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:4px}
+.uz-sub{font-size:12px;color:var(--text3)}
 
-.file-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;font-size:13px}
-.file-item-icon{font-size:18px;flex-shrink:0}
-.file-item-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.file-item-size{color:var(--text-muted);flex-shrink:0;font-size:12px}
-.file-item-remove{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;padding:0;line-height:1;flex-shrink:0}
-.file-item-remove:hover{color:var(--red)}
-.file-item-status{font-size:11px;color:var(--green);font-weight:500}
-.file-item-err{font-size:11px;color:var(--red);font-weight:500}
+.paste-area{width:100%;min-height:180px;border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;font-family:var(--mono);font-size:12px;color:var(--text);background:var(--white);resize:vertical;transition:border-color .12s;line-height:1.7}
+.paste-area:focus{outline:none;border-color:var(--teal)}
 
-/* FIELDS */
-.field-group{margin-bottom:18px}
-.field-label{font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:6px;display:block;letter-spacing:0.02em}
-.field-label span{color:var(--red);margin-left:2px}
-.field-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--white);transition:border-color 0.15s}
-.field-input:focus{outline:none;border-color:var(--green)}
-textarea.field-input{resize:vertical;min-height:72px;line-height:1.6}
+.file-chip{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:7px;font-size:13px}
+.fc-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-ok{color:var(--green);font-size:11px;font-weight:500}
+.fc-err{color:var(--red);font-size:11px}
+.fc-rm{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;line-height:1;padding:0}
+.fc-rm:hover{color:var(--red)}
 
-/* BTNS */
-.btn-primary{padding:13px 28px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
-.btn-primary:hover{background:var(--navy-light)}
-.btn-primary:disabled{background:var(--slate-light);cursor:not-allowed}
-.btn-secondary{padding:11px 20px;background:var(--white);color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
-.btn-secondary:hover{border-color:var(--navy);color:var(--navy)}
-.btn-green{padding:11px 20px;background:var(--green-pale);color:var(--green);border:1px solid rgba(45,134,83,0.3);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
-.btn-green:hover{background:var(--green);color:#fff}
+/* ── DATA PREVIEW TABLE ── */
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:18px;background:var(--white)}
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:var(--navy);color:#fff;padding:8px 12px;text-align:left;font-weight:500;white-space:nowrap}
+.data-table td{padding:6px 12px;border-bottom:1px solid var(--border);color:var(--text2);white-space:nowrap}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg)}
+.data-table .num{text-align:right;font-family:var(--mono)}
 
-/* ALERT */
-.alert{padding:12px 16px;border-radius:var(--radius);font-size:13px;margin-bottom:16px;display:none}
-.alert.show-error{background:var(--red-pale);border:1px solid #FEB2B2;color:var(--red);display:block}
-.alert.show-info{background:var(--green-pale);border:1px solid rgba(45,134,83,0.3);color:var(--green);display:block}
+/* ── FIELDS ── */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.field-group{margin-bottom:14px}
+.field-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;display:block}
+.req{color:var(--red);margin-left:2px}
+.field-input{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font);font-size:13px;color:var(--text);background:var(--white);transition:border-color .12s}
+.field-input:focus{outline:none;border-color:var(--teal)}
+textarea.field-input{resize:vertical;min-height:64px;line-height:1.55}
+select.field-input{cursor:pointer}
 
-/* RESULTS */
-.results-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.results-title{font-size:20px;font-weight:600;color:var(--navy);flex:1}
-.export-btns{display:flex;gap:8px}
+/* ── COLUMN SELECTOR ── */
+.col-selector{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.col-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);color:var(--text2);background:var(--white);transition:all .12s;display:flex;align-items:center;gap:5px}
+.col-chip:hover{border-color:var(--teal)}
+.col-chip.sel{background:var(--indigo-pale);border-color:var(--indigo);color:var(--indigo)}
+.col-chip .ct{font-size:10px;color:var(--text3)}
+.col-chip.sel .ct{color:var(--indigo)}
 
-.phase-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:18px;overflow:hidden}
-.phase-card-hdr{padding:15px 20px;background:var(--navy);display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
-.phase-card-hdr:hover{background:var(--navy-light)}
-.phase-card-num{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.15);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.phase-card-title{font-size:14px;font-weight:600;color:#fff;flex:1}
-.phase-card-toggle{color:rgba(255,255,255,0.6);font-size:16px;transition:transform 0.2s}
-.phase-card.collapsed .phase-card-toggle{transform:rotate(-90deg)}
-.phase-card-body{padding:22px;display:block}
-.phase-card.collapsed .phase-card-body{display:none}
+/* ── BTNS ── */
+.btn-primary{padding:11px 24px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .15s}
+.btn-primary:hover{background:var(--navy2)}
+.btn-primary:disabled{background:var(--slate-lt);cursor:not-allowed}
+.btn-sec{padding:9px 18px;background:var(--white);color:var(--text2);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .12s}
+.btn-sec:hover{border-color:var(--navy);color:var(--navy)}
+.btn-teal{padding:9px 18px;background:var(--teal-pale);color:var(--teal);border:1px solid rgba(26,140,122,.25);border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .12s}
+.btn-teal:hover{background:var(--teal);color:#fff}
+.btn-row{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
 
-/* CONTENT */
-.ac{font-family:'Lora',serif;font-size:15px;line-height:1.85;color:var(--text)}
-.ac h3{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--slate);margin:22px 0 10px;padding-top:18px;border-top:1px solid var(--border)}
-.ac h3:first-child{border-top:none;padding-top:0;margin-top:0}
-.ac p{margin-bottom:14px}
-.ac ul{margin:0 0 14px 20px}
-.ac li{margin-bottom:6px}
-.ac blockquote{border-left:3px solid var(--green);padding:10px 16px;margin:14px 0;background:var(--green-pale);border-radius:0 var(--radius) var(--radius) 0;font-style:italic;color:var(--text-secondary);font-size:14px}
-.code-chip{display:inline-block;background:var(--amber-pale);color:var(--amber);padding:2px 8px;border-radius:4px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;margin:2px;border:1px solid rgba(192,122,26,0.2)}
-.cat-tag{display:inline-block;background:var(--green-pale);color:var(--green);padding:3px 10px;border-radius:20px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;margin:3px;border:1px solid rgba(45,134,83,0.2)}
-.freq-badge{font-family:'Inter',sans-serif;font-size:11px;padding:2px 8px;border-radius:10px;color:#fff;display:inline-block}
+/* ── ALERT ── */
+.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:14px;display:none}
+.alert.err{background:var(--red-pale);border:1px solid #FBBABA;color:var(--red);display:block}
+.alert.ok{background:var(--green-pale);border:1px solid rgba(31,122,74,.25);color:var(--green);display:block}
+.alert.info{background:var(--indigo-pale);border:1px solid rgba(61,82,176,.2);color:var(--indigo);display:block}
 
-/* RIGOR */
-.rigor-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.rigor-item{background:var(--cream);border-radius:var(--radius);padding:14px;border:1px solid var(--border)}
-.rigor-label{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--slate);margin-bottom:6px}
-.rigor-dots{display:flex;gap:4px;margin-bottom:8px}
-.rigor-dot{width:10px;height:10px;border-radius:50%;background:var(--border)}
-.rigor-dot.filled{background:var(--green)}
-.rigor-text{font-family:'Lora',serif;font-size:13px;color:var(--text-secondary);line-height:1.6}
-
-/* LOADING */
+/* ── LOADING ── */
 .loading-panel{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;text-align:center}
-.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-msg{font-size:15px;color:var(--text-muted);margin-bottom:6px}
-.loading-sub{font-size:12px;color:var(--green);font-weight:500}
-.prog-bar{width:100%;height:4px;background:var(--border);border-radius:2px;margin-top:20px;overflow:hidden}
-.prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width 0.4s ease}
+.prog-bar{width:100%;height:4px;background:var(--border);border-radius:2px;margin-top:18px;overflow:hidden}
+.prog-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .35s ease}
 
-/* EMPTY */
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:55vh;text-align:center;padding:40px}
-.empty-icon{font-size:52px;margin-bottom:18px;opacity:0.35}
-.empty-title{font-size:20px;font-weight:600;color:var(--navy);margin-bottom:8px}
-.empty-sub{font-size:14px;color:var(--text-muted);max-width:360px;line-height:1.75}
+/* ── RESULTS ── */
+.res-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.res-title{font-size:18px;font-weight:600;color:var(--navy);flex:1}
+.exp-btns{display:flex;gap:7px;flex-wrap:wrap}
 
-/* VALIDATION */
-.validation-box{background:var(--amber-pale);border:1px solid rgba(192,122,26,0.3);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:none}
-.validation-box.show{display:block}
-.validation-title{font-size:13px;font-weight:600;color:var(--amber);margin-bottom:8px}
-.validation-list{font-size:13px;color:var(--text-secondary);padding-left:16px}
-.validation-list li{margin-bottom:4px}
+/* ── STAT CARDS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:22px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px}
+.sc-label{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.sc-value{font-size:22px;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.2}
+.sc-unit{font-size:12px;color:var(--slate);margin-top:2px}
 
-/* PRINT */
+/* ── RESULT CARDS ── */
+.res-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden}
+.rc-head{padding:13px 18px;background:var(--navy);display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.rc-head:hover{background:var(--navy2)}
+.rc-badge{background:rgba(255,255,255,0.15);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:var(--mono)}
+.rc-title{font-size:13px;font-weight:600;color:#fff;flex:1}
+.rc-toggle{color:rgba(255,255,255,.55);font-size:14px;transition:transform .18s}
+.res-card.col .rc-toggle{transform:rotate(-90deg)}
+.rc-body{padding:20px;display:block}
+.res-card.col .rc-body{display:none}
+
+/* ── CONTENT ── */
+.ac{font-size:13px;line-height:1.8;color:var(--text)}
+.ac h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--slate);margin:18px 0 8px;padding-top:14px;border-top:1px solid var(--border)}
+.ac h4:first-child{border-top:none;padding-top:0;margin-top:0}
+.ac p{margin-bottom:12px}
+.ac ul{margin:0 0 12px 18px}
+.ac li{margin-bottom:5px}
+.sig{display:inline-block;padding:2px 8px;border-radius:4px;font-family:var(--mono);font-size:11px;font-weight:600;margin:2px}
+.sig.yes{background:var(--green-pale);color:var(--green);border:1px solid rgba(31,122,74,.2)}
+.sig.no{background:var(--amber-pale);color:var(--amber);border:1px solid rgba(184,110,0,.2)}
+.sig.neu{background:var(--bg);color:var(--slate);border:1px solid var(--border)}
+.val-pill{display:inline-block;background:var(--indigo-pale);color:var(--indigo);padding:2px 9px;border-radius:4px;font-family:var(--mono);font-size:12px;font-weight:500;margin:2px}
+.interpret{background:var(--teal-pale);border-left:3px solid var(--teal);padding:10px 14px;border-radius:0 var(--radius) var(--radius) 0;font-size:13px;color:var(--text2);margin:12px 0;line-height:1.65}
+
+/* ── LIKERT ── */
+.likert-bar{margin-bottom:12px}
+.lb-label{font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:500}
+.lb-track{height:18px;background:var(--bg);border-radius:4px;overflow:hidden;display:flex}
+.lb-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;transition:width .4s}
+
+/* ── CORR TABLE ── */
+.corr-wrap{overflow-x:auto;margin-bottom:14px}
+.corr-table{border-collapse:collapse;font-size:11px}
+.corr-table th,.corr-table td{padding:6px 10px;border:1px solid var(--border);text-align:center;white-space:nowrap}
+.corr-table th{background:var(--navy);color:#fff;font-weight:500}
+.corr-table .diag{background:var(--bg);color:var(--text3)}
+.cpos{background:#E6F5F2;color:#0B5E50}
+.cneg{background:#FEF0F0;color:#8B1E1E}
+.cneu{background:var(--bg);color:var(--text3)}
+
+/* ── CHART CANVAS ── */
+.chart-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.chart-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em}
+canvas{max-height:260px}
+
+/* ── EMPTY ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:52vh;text-align:center;padding:40px}
+.empty-icon{font-size:48px;margin-bottom:14px;opacity:.3}
+.empty-title{font-size:18px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--text3);max-width:340px;line-height:1.75}
+
+/* ── RULES GRID ── */
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.rule-item{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+.rule-title{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:3px}
+.rule-desc{font-size:12px;color:var(--text3);line-height:1.55}
+
+/* ── DOWNLOAD BTN IN HERO ── */
+.dl-btn{padding:8px 16px;background:rgba(255,255,255,0.12);color:#fff;border:1.5px solid rgba(255,255,255,.25);border-radius:var(--radius);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .12s;margin-top:14px}
+.dl-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.45)}
+
+/* ── PRINT ── */
 @media print{
-  .topbar,.sidebar,.steps-nav,.panel:not(.active),.export-btns,.btn-primary,.btn-secondary,.btn-green{display:none!important}
+  .topbar,.sidebar,.steps-nav,.panel:not(.active),.exp-btns,.btn-primary,.btn-sec,.btn-teal{display:none!important}
   .app{display:block;height:auto}
   .panel{display:block!important;padding:0}
-  .phase-card.collapsed .phase-card-body{display:block!important}
+  .res-card.col .rc-body{display:block!important}
 }
-@media(max-width:720px){
-  .app{grid-template-columns:1fr;grid-template-rows:60px auto 1fr}
+@media(max-width:700px){
+  .app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr}
   .sidebar{display:none}
-  .format-cards{grid-template-columns:1fr}
-  .rigor-grid{grid-template-columns:1fr}
+  .tmpl-grid,.field-row,.rules-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -201,916 +257,1114 @@ textarea.field-input{resize:vertical;min-height:72px;line-height:1.6}
 
 <!-- TOPBAR -->
 <header class="topbar">
-  <div class="topbar-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.1)"/>
-      <path d="M7 8h14M7 12h10M7 16h12M7 20h7" stroke="#2D8653" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="21" cy="19" r="4.5" fill="#2D8653"/>
-      <path d="M19.5 19l1 1 1.5-1.5" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+  <div class="logo-mark">
+    <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="10" width="3" height="7" rx="1.5" fill="white"/>
+      <rect x="6" y="6" width="3" height="11" rx="1.5" fill="white"/>
+      <rect x="11" y="2" width="3" height="15" rx="1.5" fill="white"/>
+      <rect x="16" y="8" width="1.5" height="9" rx=".75" fill="rgba(255,255,255,.4)"/>
     </svg>
-    <span class="topbar-title">AnálisisCual</span>
   </div>
-  <span class="topbar-sub">Análisis cualitativo estructurado · Sin dependencias externas</span>
+  <span class="app-name">AnalisisCuant</span>
+  <div class="mode-pills">
+    <button class="mode-pill active" id="mpInv" onclick="setMode('inv')">🔬 Investigación</button>
+    <button class="mode-pill" id="mpGen" onclick="setMode('gen')">📊 Datos generales</button>
+  </div>
+  <span class="app-sub">Análisis cuantitativo · Sin backend · 100% local</span>
 </header>
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sidebar-label">Navegación</div>
-  <button class="phase-btn active" onclick="goStep(0)">
-    <span class="ph-num">1</span><span class="ph-name">Plantilla de datos</span><span class="ph-check">✓</span>
-  </button>
-  <button class="phase-btn" onclick="goStep(1)">
-    <span class="ph-num">2</span><span class="ph-name">Cargar archivos</span><span class="ph-check">✓</span>
-  </button>
-  <button class="phase-btn" onclick="goStep(2)">
-    <span class="ph-num">3</span><span class="ph-name">Contexto</span><span class="ph-check">✓</span>
-  </button>
-  <button class="phase-btn" onclick="goStep(3)">
-    <span class="ph-num">4</span><span class="ph-name">Resultados</span><span class="ph-check">✓</span>
-  </button>
-
-  <div class="sidebar-label" style="margin-top:20px">Fases del análisis</div>
-  <button class="phase-btn" onclick="scrollPhase(1)"><span class="ph-num" style="font-size:10px">F1</span><span class="ph-name">Organización</span></button>
-  <button class="phase-btn" onclick="scrollPhase(2)"><span class="ph-num" style="font-size:10px">F2</span><span class="ph-name">Codificación</span></button>
-  <button class="phase-btn" onclick="scrollPhase(3)"><span class="ph-num" style="font-size:10px">F3</span><span class="ph-name">Categorización</span></button>
-  <button class="phase-btn" onclick="scrollPhase(4)"><span class="ph-num" style="font-size:10px">F4</span><span class="ph-name">Interpretación</span></button>
-  <button class="phase-btn" onclick="scrollPhase(5)"><span class="ph-num" style="font-size:10px">F5</span><span class="ph-name">Marco teórico</span></button>
-  <button class="phase-btn" onclick="scrollPhase(6)"><span class="ph-num" style="font-size:10px">F6</span><span class="ph-name">Evidencias</span></button>
-  <button class="phase-btn" onclick="scrollPhase(7)"><span class="ph-num" style="font-size:10px">F7</span><span class="ph-name">Rigor científico</span></button>
-  <button class="phase-btn" onclick="scrollPhase(8)"><span class="ph-num" style="font-size:10px">F8</span><span class="ph-name">Resultados</span></button>
-
-  <div class="sidebar-footer">
-    Herramienta 100% local.<br>Tus datos nunca salen de tu navegador.
+  <div class="sb-section">
+    <div class="sb-label">Flujo de trabajo</div>
+    <button class="sb-btn active" id="sbStep0" onclick="goStep(0)"><span class="sb-icon">📋</span>Plantilla de datos</button>
+    <button class="sb-btn" id="sbStep1" onclick="goStep(1)"><span class="sb-icon">⬆</span>Cargar datos</button>
+    <button class="sb-btn" id="sbStep2" onclick="goStep(2)"><span class="sb-icon">⚙</span>Configuración</button>
+    <button class="sb-btn" id="sbStep3" onclick="goStep(3)"><span class="sb-icon">📈</span>Resultados</button>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section" id="sidebarSections" style="display:none">
+    <div class="sb-label">Secciones del informe</div>
+    <button class="sb-btn" onclick="scrollSec('s-desc')"><span class="sb-icon" style="font-size:10px">E1</span>Estadística descriptiva</button>
+    <button class="sb-btn" onclick="scrollSec('s-dist')"><span class="sb-icon" style="font-size:10px">E2</span>Distribución</button>
+    <button class="sb-btn" onclick="scrollSec('s-corr')"><span class="sb-icon" style="font-size:10px">E3</span>Correlaciones</button>
+    <button class="sb-btn" onclick="scrollSec('s-inf')"><span class="sb-icon" style="font-size:10px">E4</span>Pruebas inferenciales</button>
+    <button class="sb-btn" id="sb-likert-btn" onclick="scrollSec('s-lik')" style="display:none"><span class="sb-icon" style="font-size:10px">E5</span>Escala Likert</button>
+    <button class="sb-btn" id="sb-fact-btn" onclick="scrollSec('s-fact')" style="display:none"><span class="sb-icon" style="font-size:10px">E6</span>Regresión</button>
+    <button class="sb-btn" onclick="scrollSec('s-conc')"><span class="sb-icon" style="font-size:10px">E7</span>Conclusiones</button>
+  </div>
+  <div class="sb-footer">
+    Procesamiento 100% local.<br>Tus datos nunca salen del navegador.<br><br>
+    <span style="color:var(--teal);font-weight:500">v1.0 · ES/EN</span>
   </div>
 </aside>
 
 <!-- MAIN -->
 <main class="main" id="mainEl">
-
-  <!-- STEP TABS -->
   <nav class="steps-nav">
     <button class="step-tab active" id="tab0" onclick="goStep(0)"><span class="step-n">1</span>Plantilla</button>
-    <button class="step-tab" id="tab1" onclick="goStep(1)"><span class="step-n">2</span>Archivos</button>
-    <button class="step-tab" id="tab2" onclick="goStep(2)"><span class="step-n">3</span>Contexto</button>
+    <button class="step-tab" id="tab1" onclick="goStep(1)"><span class="step-n">2</span>Datos</button>
+    <button class="step-tab" id="tab2" onclick="goStep(2)"><span class="step-n">3</span>Config.</button>
     <button class="step-tab" id="tab3" onclick="goStep(3)"><span class="step-n">4</span>Análisis</button>
   </nav>
 
-  <!-- PANEL 0: PLANTILLA -->
+  <!-- ══ PANEL 0: PLANTILLA ══ -->
   <div class="panel active" id="panel0">
-    <div class="template-hero">
-      <h2>📋 Antes de analizar, prepara tu archivo</h2>
-      <p>Para que el análisis sea preciso y estructurado, tu documento debe seguir una estructura específica. Descarga la plantilla, llénala con tus datos y cárgala en el paso 2.</p>
-      <div class="template-actions">
-        <button class="btn-dl" onclick="downloadTemplate('txt')">⬇ Descargar plantilla TXT</button>
-        <button class="btn-dl" onclick="downloadTemplate('md')">⬇ Descargar plantilla MD</button>
-        <button class="btn-dl secondary" onclick="goStep(1)">Saltar → ya tengo mi archivo</button>
+    <div class="mode-hero inv" id="heroInv">
+      <div class="mh-icon inv">🔬</div>
+      <div>
+        <div class="mh-title">Modo Investigación</div>
+        <div class="mh-desc">Estadística descriptiva e inferencial completa: pruebas t, chi-cuadrado, ANOVA, correlaciones, regresión, normalidad, escalas Likert e índices para artículos y tesis.</div>
+        <button class="dl-btn" onclick="downloadTemplate()">⬇ Descargar plantilla para este modo</button>
+      </div>
+    </div>
+    <div class="mode-hero gen" id="heroGen" style="display:none">
+      <div class="mh-icon gen">📊</div>
+      <div>
+        <div class="mh-title">Modo Datos generales</div>
+        <div class="mh-desc">Resúmenes ejecutivos, tablas de frecuencia, gráficas descriptivas y tendencias para reportes institucionales, empresariales o de gestión.</div>
+        <button class="dl-btn" onclick="downloadTemplate()">⬇ Descargar plantilla para este modo</button>
       </div>
     </div>
 
-    <h3 style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:12px">¿Qué tipo de dato vas a analizar?</h3>
-    <div class="format-cards">
-      <div class="format-card selected" id="fc-entrevista" onclick="selectFormat('entrevista')">
-        <div class="format-card-icon">🎤</div>
-        <div class="format-card-title">Entrevista / Transcripción</div>
-        <div class="format-card-desc">Diálogos con participantes, entrevistas a profundidad, grupos focales. Incluye turnos de habla con identificadores de participante.</div>
+    <div class="sec-head">Selecciona el tipo de datos</div>
+    <p class="sec-sub">La plantilla descargada se adapta al tipo seleccionado.</p>
+
+    <div class="tmpl-grid" id="invTemplates">
+      <div class="tmpl-card sel" id="tc-likert" onclick="selTemplate('likert')">
+        <div class="tc-icon">📋</div>
+        <div class="tc-title">Escala Likert / Encuesta</div>
+        <div class="tc-desc">Instrumentos de medición con ítems de 1–5 o 1–7. Incluye cálculo de alfa de Cronbach e índices por dimensión.</div>
       </div>
-      <div class="format-card" id="fc-observacion" onclick="selectFormat('observacion')">
-        <div class="format-card-icon">👁</div>
-        <div class="format-card-title">Notas de campo / Observación</div>
-        <div class="format-card-desc">Registros etnográficos, diarios de campo, notas de observación participante con contexto, actores y eventos.</div>
+      <div class="tmpl-card" id="tc-grupos" onclick="selTemplate('grupos')">
+        <div class="tc-icon">👥</div>
+        <div class="tc-title">Comparación de grupos</div>
+        <div class="tc-desc">Variables continuas por grupo o condición. Para pruebas t, ANOVA y Mann-Whitney.</div>
       </div>
-      <div class="format-card" id="fc-documento" onclick="selectFormat('documento')">
-        <div class="format-card-icon">📄</div>
-        <div class="format-card-title">Análisis documental</div>
-        <div class="format-card-desc">Documentos institucionales, archivos, registros escritos, informes, actas u otros textos secundarios.</div>
+      <div class="tmpl-card" id="tc-continua" onclick="selTemplate('continua')">
+        <div class="tc-icon">📉</div>
+        <div class="tc-title">Variables continuas</div>
+        <div class="tc-desc">Múltiples variables numéricas para correlación, regresión y análisis factorial básico.</div>
       </div>
-      <div class="format-card" id="fc-mixto" onclick="selectFormat('mixto')">
-        <div class="format-card-icon">🗂</div>
-        <div class="format-card-title">Múltiples fuentes / Mixto</div>
-        <div class="format-card-desc">Combinación de fuentes: entrevistas + notas + documentos. Organiza cada fuente en secciones diferenciadas.</div>
+      <div class="tmpl-card" id="tc-categorica" onclick="selTemplate('categorica')">
+        <div class="tc-icon">🏷</div>
+        <div class="tc-title">Variables categóricas</div>
+        <div class="tc-desc">Frecuencias, tablas cruzadas y prueba chi-cuadrado para datos nominales u ordinales.</div>
       </div>
     </div>
 
-    <h3 style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:12px">Vista previa de la plantilla seleccionada</h3>
-    <div class="preview-box">
-      <div class="preview-header">
-        <div class="preview-dot" style="background:#FF5F57"></div>
-        <div class="preview-dot" style="background:#FEBC2E"></div>
-        <div class="preview-dot" style="background:#28C840"></div>
-        <span class="preview-title" id="previewTitle">plantilla-entrevista.txt</span>
+    <div class="tmpl-grid" id="genTemplates" style="display:none">
+      <div class="tmpl-card sel" id="tc-reporte" onclick="selTemplate('reporte')">
+        <div class="tc-icon">📑</div>
+        <div class="tc-title">Indicadores de gestión</div>
+        <div class="tc-desc">KPIs, metas vs. resultados, variación porcentual. Para reportes de seguimiento institucional o empresarial.</div>
       </div>
-      <div class="preview-body" id="previewBody"></div>
+      <div class="tmpl-card" id="tc-ventas" onclick="selTemplate('ventas')">
+        <div class="tc-icon">📦</div>
+        <div class="tc-title">Series / Tendencias</div>
+        <div class="tc-desc">Datos por período (mes, trimestre, año). Tendencia, variación y proyección simple.</div>
+      </div>
+      <div class="tmpl-card" id="tc-frecuencias" onclick="selTemplate('frecuencias')">
+        <div class="tc-icon">📊</div>
+        <div class="tc-title">Frecuencias y conteos</div>
+        <div class="tc-desc">Distribución de respuestas, categorías o eventos. Porcentajes y gráfica de barras.</div>
+      </div>
+      <div class="tmpl-card" id="tc-cruzado" onclick="selTemplate('cruzado')">
+        <div class="tc-icon">🔀</div>
+        <div class="tc-title">Tabla cruzada</div>
+        <div class="tc-desc">Relación entre dos variables categóricas con frecuencias absolutas y relativas.</div>
+      </div>
     </div>
 
-    <h3 style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:10px">Reglas clave para el archivo</h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px" id="rulesGrid"></div>
+    <div class="sec-head" style="margin-bottom:10px">Vista previa de la plantilla</div>
+    <div class="code-box">
+      <div class="cb-header">
+        <div class="cb-dot" style="background:#FF5F57"></div>
+        <div class="cb-dot" style="background:#FEBC2E"></div>
+        <div class="cb-dot" style="background:#28C840"></div>
+        <span class="cb-fname" id="previewFname">plantilla-likert.csv</span>
+      </div>
+      <div class="cb-body" id="previewBody"></div>
+    </div>
 
-    <button class="btn-primary" onclick="downloadTemplate('txt')">⬇ Descargar plantilla y continuar →</button>
+    <div class="sec-head" style="margin-bottom:10px">Reglas del archivo</div>
+    <div class="rules-grid" id="rulesGrid"></div>
+
+    <button class="btn-primary" onclick="downloadTemplate()">⬇ Descargar plantilla y continuar →</button>
   </div>
 
-  <!-- PANEL 1: ARCHIVOS -->
+  <!-- ══ PANEL 1: DATOS ══ -->
   <div class="panel" id="panel1">
-    <h2 style="font-size:18px;font-weight:600;color:var(--navy);margin-bottom:6px">Cargar archivos de datos</h2>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Arrastra o selecciona los archivos preparados con la plantilla. Puedes cargar múltiples archivos.</p>
+    <div class="sec-head">Cargar datos</div>
+    <p class="sec-sub">Sube un archivo CSV/TXT o pega los datos directamente.</p>
 
-    <div class="upload-zone" id="uploadZone">
-      <input type="file" id="fileInput" multiple accept=".txt,.md" onchange="handleFiles(this.files)">
-      <span class="upload-icon">📂</span>
-      <div class="upload-title">Arrastra tus archivos aquí</div>
-      <div class="upload-sub">O haz clic para seleccionarlos</div>
-      <div class="upload-formats">TXT · MD</div>
+    <div class="input-tabs">
+      <button class="itab active" id="itab-file" onclick="setInputTab('file')">⬆ Subir archivo</button>
+      <button class="itab" id="itab-paste" onclick="setInputTab('paste')">✏ Pegar datos</button>
     </div>
 
-    <div id="filesList"></div>
+    <div id="pane-file">
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" multiple accept=".csv,.txt" onchange="handleFiles(this.files)">
+        <span class="uz-icon">📂</span>
+        <div class="uz-title">Arrastra el archivo aquí</div>
+        <div class="uz-sub">O haz clic para seleccionar · CSV o TXT</div>
+      </div>
+      <div id="filesList"></div>
+    </div>
 
-    <div id="validationBox" class="validation-box">
-      <div class="validation-title">⚠ Observaciones en los archivos</div>
-      <ul class="validation-list" id="validationList"></ul>
+    <div id="pane-paste" style="display:none">
+      <p style="font-size:12px;color:var(--text3);margin-bottom:8px">Primera fila = encabezados de columnas. Separa con coma, punto y coma o tabulación.</p>
+      <textarea class="paste-area" id="pasteArea" placeholder="variable1,variable2,variable3&#10;4,5,3&#10;3,4,5&#10;5,5,4&#10;2,3,4" onchange="parsePaste()" oninput="parsePaste()"></textarea>
     </div>
 
     <div id="alertBox1" class="alert"></div>
 
-    <div style="display:flex;gap:12px;margin-top:8px">
-      <button class="btn-secondary" onclick="goStep(0)">← Volver a plantilla</button>
+    <div id="previewSection" style="display:none">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Vista previa de datos — <span id="previewCount"></span></div>
+      <div class="table-wrap"><table class="data-table" id="previewTable"></table></div>
+      <div id="colTypes" style="font-size:12px;color:var(--text3);margin-bottom:14px"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep(0)">← Plantilla</button>
       <button class="btn-primary" id="btnNext1" onclick="goStep(2)" disabled>Continuar →</button>
     </div>
   </div>
 
-  <!-- PANEL 2: CONTEXTO -->
+  <!-- ══ PANEL 2: CONFIGURACIÓN ══ -->
   <div class="panel" id="panel2">
-    <h2 style="font-size:18px;font-weight:600;color:var(--navy);margin-bottom:6px">Contexto de la investigación</h2>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Esta información permite que el análisis se oriente adecuadamente a tus objetivos y marco teórico.</p>
+    <div class="sec-head">Configuración del análisis</div>
+    <p class="sec-sub">Selecciona las variables a analizar y describe tu investigación.</p>
 
-    <div class="field-group">
-      <label class="field-label" for="fQuestion">Pregunta o problema de investigación <span>*</span></label>
-      <textarea class="field-input" id="fQuestion" rows="2" placeholder="¿Cuáles son las percepciones de los docentes universitarios sobre la integración de herramientas de IA en el aula?"></textarea>
+    <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Variables detectadas</div>
+    <div class="col-selector" id="colSelector"></div>
+
+    <!-- INV extras -->
+    <div id="invConfig">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Variable de agrupación (para pruebas t / ANOVA)</label>
+          <select class="field-input" id="groupVar"><option value="">— Ninguna —</option></select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Tipo de escala Likert</label>
+          <select class="field-input" id="likertScale">
+            <option value="0">— No aplica —</option>
+            <option value="5">1 a 5 (muy en desacuerdo → muy de acuerdo)</option>
+            <option value="7">1 a 7</option>
+            <option value="4">1 a 4</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Nivel de significancia (α)</label>
+          <select class="field-input" id="alphaLevel">
+            <option value="0.05">0.05 (estándar)</option>
+            <option value="0.01">0.01 (estricto)</option>
+            <option value="0.10">0.10 (exploratorio)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Prueba inferencial principal</label>
+          <select class="field-input" id="mainTest">
+            <option value="auto">Automática según los datos</option>
+            <option value="t">Prueba t de Student</option>
+            <option value="mann">Mann-Whitney U</option>
+            <option value="anova">ANOVA de un factor</option>
+            <option value="chi">Chi-cuadrado</option>
+            <option value="corr">Solo correlaciones</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Título del estudio<span class="req">*</span></label>
+          <input class="field-input" id="studyTitle" placeholder="Percepción de calidad del servicio en estudiantes universitarios">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Institución / Programa</label>
+          <input class="field-input" id="studyInst" placeholder="Fundación Universitaria del Área Andina">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Hipótesis o pregunta de investigación</label>
+        <textarea class="field-input" id="studyHyp" placeholder="H1: Existe una diferencia significativa en la percepción de calidad según el campus de los estudiantes."></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Número de participantes / casos</label>
+          <input class="field-input" id="studyN" type="number" placeholder="120">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Técnica de muestreo</label>
+          <input class="field-input" id="studySampling" placeholder="Muestreo aleatorio estratificado">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Observaciones metodológicas</label>
+        <textarea class="field-input" id="studyNotes" placeholder="Instrumento validado por juicio de expertos. Aplicado entre enero y marzo de 2025."></textarea>
+      </div>
     </div>
-    <div class="field-group">
-      <label class="field-label" for="fObjectives">Objetivos de la investigación <span>*</span></label>
-      <textarea class="field-input" id="fObjectives" rows="2" placeholder="Explorar las experiencias, resistencias y expectativas del cuerpo docente frente a herramientas de IA pedagógicas..."></textarea>
-    </div>
-    <div class="field-group">
-      <label class="field-label" for="fTheory">Marco teórico de referencia</label>
-      <input class="field-input" id="fTheory" placeholder="Teoría fundamentada, fenomenología, constructivismo social, análisis del discurso...">
-    </div>
-    <div class="field-group">
-      <label class="field-label" for="fMethod">Metodología empleada</label>
-      <input class="field-input" id="fMethod" placeholder="Estudio de caso, etnografía, investigación-acción participativa, análisis narrativo...">
-    </div>
-    <div class="field-group">
-      <label class="field-label" for="fParticipants">Descripción de los participantes</label>
-      <textarea class="field-input" id="fParticipants" rows="2" placeholder="Docentes universitarios de diversas facultades, entre 35 y 58 años, con distintos niveles de experiencia con tecnología..."></textarea>
-    </div>
-    <div class="field-group">
-      <label class="field-label" for="fContext">Contexto del estudio</label>
-      <input class="field-input" id="fContext" placeholder="Universidad pública colombiana, 2024, contexto de transformación digital post-pandemia...">
+
+    <!-- GEN config -->
+    <div id="genConfig" style="display:none">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Título del reporte<span class="req">*</span></label>
+          <input class="field-input" id="repTitle" placeholder="Informe de indicadores académicos 2025-I">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Área / Dependencia</label>
+          <input class="field-input" id="repArea" placeholder="Vicerrectoría Académica — Areandina">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Período o contexto de los datos</label>
+        <input class="field-input" id="repPeriod" placeholder="Primer semestre 2025 · Sede Pereira">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Objetivo del reporte</label>
+        <textarea class="field-input" id="repObj" placeholder="Evaluar el comportamiento de los indicadores de matrícula y retención durante el período..."></textarea>
+      </div>
     </div>
 
     <div id="alertBox2" class="alert"></div>
-
-    <div style="display:flex;gap:12px;margin-top:8px">
-      <button class="btn-secondary" onclick="goStep(1)">← Volver</button>
-      <button class="btn-primary" id="btnAnalyze" onclick="runAnalysis()">🔬 Ejecutar análisis</button>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep(1)">← Datos</button>
+      <button class="btn-primary" onclick="runAnalysis()">⚙ Ejecutar análisis</button>
     </div>
   </div>
 
-  <!-- PANEL 3: RESULTADOS -->
+  <!-- ══ PANEL 3: RESULTADOS ══ -->
   <div class="panel" id="panel3">
-    <div id="emptyState" class="empty-state">
+    <div class="empty" id="emptyState">
       <div class="empty-icon">📊</div>
-      <div class="empty-title">Aquí aparecerá el análisis</div>
-      <div class="empty-sub">Completa los pasos anteriores y ejecuta el análisis para ver los resultados estructurados por fases.</div>
+      <div class="empty-title">Los resultados aparecerán aquí</div>
+      <div class="empty-sub">Completa los pasos anteriores y ejecuta el análisis para ver el informe estadístico completo.</div>
     </div>
-
     <div id="resultsArea" style="display:none">
-      <div class="results-header">
-        <div class="results-title">📊 Informe de análisis cualitativo</div>
-        <div class="export-btns">
-          <button class="btn-secondary" onclick="exportHTML()">📄 HTML</button>
-          <button class="btn-secondary" onclick="exportTXT()">📝 TXT</button>
-          <button class="btn-secondary" onclick="window.print()">🖨</button>
-          <button class="btn-green" onclick="resetAll()">+ Nuevo</button>
+      <div class="res-header">
+        <div class="res-title" id="resTitle">Informe de análisis cuantitativo</div>
+        <div class="exp-btns">
+          <button class="btn-sec" onclick="exportHTML('es')">📄 HTML (ES)</button>
+          <button class="btn-sec" onclick="exportHTML('en')">📄 HTML (EN)</button>
+          <button class="btn-sec" onclick="exportTXT()">📝 TXT</button>
+          <button class="btn-sec" onclick="window.print()">🖨</button>
+          <button class="btn-teal" onclick="resetAll()">+ Nuevo</button>
         </div>
       </div>
-      <div id="phasesContainer"></div>
+      <div id="resultsContainer"></div>
     </div>
   </div>
-
 </main>
 </div>
 
 <script>
-// ─── STATE ───────────────────────────────────────────────
-let uploadedFiles = [];
-let parsedData = [];
-let selectedFormat = 'entrevista';
-let analysisResult = {};
+// ══ STATE ══
+let MODE = 'inv';
+let TMPL = 'likert';
+let rawData = [];
+let headers = [];
+let numericCols = [];
+let selectedCols = [];
+let charts = [];
 
-// ─── TEMPLATES ───────────────────────────────────────────
+// ══ MODE ══
+function setMode(m) {
+  MODE = m;
+  document.getElementById('mpInv').classList.toggle('active', m==='inv');
+  document.getElementById('mpGen').classList.toggle('active', m==='gen');
+  document.getElementById('heroInv').style.display = m==='inv'?'flex':'none';
+  document.getElementById('heroGen').style.display = m==='gen'?'flex':'none';
+  document.getElementById('invTemplates').style.display = m==='inv'?'grid':'none';
+  document.getElementById('genTemplates').style.display = m==='gen'?'grid':'none';
+  document.getElementById('invConfig').style.display = m==='inv'?'block':'none';
+  document.getElementById('genConfig').style.display = m==='gen'?'block':'none';
+  TMPL = m==='inv'?'likert':'reporte';
+  document.querySelectorAll('#invTemplates .tmpl-card,#genTemplates .tmpl-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('tc-'+(m==='inv'?'likert':'reporte'))?.classList.add('sel');
+  renderPreview();
+}
+
+// ══ TEMPLATES ══
 const TEMPLATES = {
-  entrevista: {
-    title: 'plantilla-entrevista.txt',
-    rules: [
-      ['METADATOS requeridos','Incluye TITULO, FECHA, PARTICIPANTES y OBJETIVO al inicio.'],
-      ['Identificador de participante','Cada intervención inicia con P1:, P2:, E: (entrevistador), etc.'],
-      ['Un turno por línea','Cada línea es una intervención completa. No partas en mitad de idea.'],
-      ['Sección REFLEXIONES','Al final, escribe tus notas analíticas bajo la sección REFLEXIONES DEL INVESTIGADOR.'],
+  likert:{
+    fname:'plantilla-likert.csv',
+    rules:[
+      ['Primera fila = encabezados','Cada columna es un ítem. Ejemplo: "item1, item2, item3" o "P1, P2, P3".'],
+      ['Valores de 1 a 5 (o 1 a 7)','Solo números enteros. Sin texto, sin celdas vacías.'],
+      ['Columna de grupo (opcional)','Agrega una columna "grupo" con etiquetas como "A","B" para comparar.'],
+      ['Un participante por fila','Cada fila es la respuesta completa de un participante.'],
     ],
-    content: `# DATOS DE IDENTIFICACIÓN
-TITULO: [Nombre descriptivo de la entrevista]
-FECHA: [DD/MM/AAAA]
-LUGAR: [Lugar o modalidad: presencial, virtual]
-DURACIÓN: [HH:MM]
-PARTICIPANTES: [Lista: P1 = nombre o pseudónimo, P2 = ...]
-ENTREVISTADOR: [Nombre o iniciales]
-OBJETIVO: [Objetivo específico de esta sesión]
-METODOLOGÍA: [Entrevista semiestructurada / grupo focal / historia de vida]
-
----
-
-# TRANSCRIPCIÓN
-
-E: Buenas tardes, gracias por participar. ¿Podría contarme cómo fue su experiencia con...?
-
-P1: Bueno, la verdad fue algo inesperado. Al principio sentí resistencia porque no sabía cómo funcionaba, pero con el tiempo fui viendo que podía ayudarme en tareas repetitivas.
-
-E: ¿Y qué fue lo que más le generó resistencia al inicio?
-
-P1: El miedo a equivocarse, supongo. No quería cometer errores frente a mis estudiantes usando una herramienta que yo mismo no dominaba.
-
-P2: En mi caso fue diferente. Yo lo vi como una oportunidad desde el principio, aunque sí tuve que aprender mucho por mi cuenta porque no hubo capacitación institucional.
-
-E: ¿Considera que la institución los apoyó en ese proceso?
-
-P1: Para nada. Fue totalmente autodidacta.
-
-P2: Yo diría que hubo un apoyo mínimo, más de compañeros que de la institución misma.
-
----
-
-# REFLEXIONES DEL INVESTIGADOR
-[Escribe aquí tus notas analíticas, impresiones, tensiones observadas, hipótesis preliminares, conexiones con el marco teórico]
-
-Observé que ambos participantes mencionan la falta de apoyo institucional como un factor determinante. La diferencia en sus actitudes iniciales (resistencia vs. apertura) podría estar relacionada con la generación o el área disciplinar.`
+    content:`# Plantilla: Escala Likert / Encuesta\n# Instrucciones: reemplaza los datos de ejemplo con los tuyos.\n# Primera fila = nombres de las variables. Una fila por participante.\n\nid,grupo,item1,item2,item3,item4,item5,item6,item7,item8\n1,A,4,5,3,4,5,4,3,4\n2,A,5,5,4,5,5,5,4,5\n3,B,3,3,4,3,2,3,4,3\n4,B,2,2,3,2,3,2,3,2\n5,A,4,4,5,4,4,4,5,4\n6,B,3,4,3,4,3,3,3,4\n7,A,5,5,5,5,5,5,5,5\n8,B,2,3,2,3,2,2,2,3`
   },
-
-  observacion: {
-    title: 'plantilla-observacion.txt',
-    rules: [
-      ['METADATOS del registro','Incluye FECHA, LUGAR, HORA, OBSERVADOR y SESIÓN.'],
-      ['Separar descripción de interpretación','Usa las secciones DESCRIPCIÓN (qué pasó) e INTERPRETACIÓN (qué significa).'],
-      ['Actores y eventos','Nombra a los actores como A1, A2... y describe sus acciones con detalle.'],
-      ['Notas del investigador','Registra tus dudas, emociones y conexiones teóricas en NOTAS DEL INVESTIGADOR.'],
+  grupos:{
+    fname:'plantilla-grupos.csv',
+    rules:[
+      ['Una columna "grupo"','Contiene la etiqueta de cada grupo. Ejemplo: "control","experimental".'],
+      ['Variables continuas','Las demás columnas son numéricas (puntuaciones, tiempos, medidas).'],
+      ['Sin texto en celdas numéricas','Solo números decimales. Punto como separador decimal.'],
+      ['Mínimo 20 filas recomendadas','Para que las pruebas inferenciales sean válidas.'],
     ],
-    content: `# REGISTRO DE OBSERVACIÓN
-
-SESIÓN: [Número y nombre de la sesión]
-FECHA: [DD/MM/AAAA]
-HORA INICIO: [HH:MM]   HORA FIN: [HH:MM]
-LUGAR: [Descripción del espacio físico]
-OBSERVADOR: [Nombre o iniciales]
-TIPO: [Participante / No participante / Semiestructurada]
-
----
-
-# DESCRIPCIÓN (Qué ocurrió — registro objetivo)
-
-A1 (docente titular) inicia la clase a las 8:05. Se dirige al frente del salón con una tablet en mano. Hay 23 estudiantes presentes de 28 inscritos. El ambiente es tranquilo.
-
-A1 proyecta una presentación y dice: "Hoy vamos a explorar una herramienta nueva". Se percibe murmullos entre los estudiantes (A3, A7, A12).
-
-A3 levanta la mano y pregunta si van a usar inteligencia artificial. A1 responde afirmativamente con cautela visible: voz más baja, pausa antes de responder.
-
----
-
-# INTERPRETACIÓN (Qué podría significar)
-
-La actitud corporal de A1 al mencionar la IA sugiere incomodidad o inseguridad. La pregunta espontánea de A3 indica que el tema ya estaba en el imaginario del grupo.
-
----
-
-# NOTAS DEL INVESTIGADOR
-[Reflexiones personales, dudas metodológicas, hipótesis emergentes, conexiones teóricas]
-
-Me pregunto si la incomodidad de A1 es representativa del cuerpo docente o es un caso particular. Conecta con lo que plantea Guba sobre la resistencia al cambio en organizaciones educativas.`
+    content:`# Plantilla: Comparación de grupos\n\nid,grupo,puntaje,tiempo,nota\n1,control,65.2,18.4,3.8\n2,control,70.1,16.2,4.0\n3,experimental,82.3,14.1,4.5\n4,experimental,79.8,15.0,4.3\n5,control,58.4,20.3,3.5\n6,experimental,88.1,12.8,4.7\n7,control,63.9,19.1,3.7\n8,experimental,85.4,13.5,4.6`
   },
-
-  documento: {
-    title: 'plantilla-documental.txt',
-    rules: [
-      ['Metadatos del documento','Incluye TÍTULO, TIPO, FUENTE, FECHA y AUTOR del documento analizado.'],
-      ['Transcripción o resumen fiel','Copia los fragmentos relevantes en la sección CONTENIDO o resúmelos con fidelidad.'],
-      ['Fragmentos clave','Marca con [CITA] los fragmentos textuales más importantes para el análisis.'],
-      ['Análisis preliminar','En ANÁLISIS DEL INVESTIGADOR, registra tu lectura interpretativa del documento.'],
+  continua:{
+    fname:'plantilla-continua.csv',
+    rules:[
+      ['Solo columnas numéricas','Para correlación y regresión, todas las variables deben ser numéricas.'],
+      ['Sin valores faltantes','Completa los datos o usa 0 solo si tiene sentido metodológico.'],
+      ['Encabezados descriptivos','Usa nombres cortos pero claros: "ingreso_mensual", "edad", "años_exp".'],
+      ['Mínimo 30 casos','Para correlación y regresión se recomienda n ≥ 30.'],
     ],
-    content: `# FICHA DOCUMENTAL
-
-DOCUMENTO_ID: [DOC-001]
-TITULO: [Título exacto del documento]
-TIPO: [Política institucional / Acta / Informe / Circular / Otro]
-FUENTE: [Institución u organización que lo emite]
-FECHA_EMISIÓN: [DD/MM/AAAA]
-AUTOR: [Nombre, cargo o dependencia]
-PÁGINAS: [Número de páginas]
-RELEVANCIA: [Por qué es pertinente para la investigación]
-
----
-
-# CONTENIDO RELEVANTE
-
-[CITA] "La institución promoverá la incorporación de tecnologías emergentes en los procesos pedagógicos, garantizando la formación continua del cuerpo docente."
-
-El documento establece lineamientos generales para la transformación digital, sin especificar mecanismos concretos de implementación ni indicadores de seguimiento.
-
-[CITA] "Se destinará el 5% del presupuesto de formación docente a iniciativas de alfabetización digital durante el período 2024-2025."
-
----
-
-# ANÁLISIS DEL INVESTIGADOR
-[Tu lectura interpretativa: qué dice, qué omite, qué tensiones genera, cómo se relaciona con los hallazgos de campo]
-
-Llama la atención la brecha entre el lenguaje aspiracional del documento y la ausencia de mecanismos operativos. Esto contrasta con lo expresado por los participantes en las entrevistas sobre falta de apoyo institucional.`
+    content:`# Plantilla: Variables continuas / Correlación / Regresión\n\nid,edad,ingresos,satisfaccion,años_exp,productividad\n1,28,1800000,4.2,3,72\n2,35,2400000,3.8,8,68\n3,42,3100000,4.5,15,85\n4,31,2100000,3.5,5,65\n5,29,1950000,4.0,4,71\n6,48,3800000,4.8,20,91\n7,26,1700000,3.2,2,60\n8,39,2900000,4.3,12,82`
   },
-
-  mixto: {
-    title: 'plantilla-mixta.txt',
-    rules: [
-      ['Encabezado por fuente','Cada fuente debe tener su propio bloque con TIPO_FUENTE y metadatos.'],
-      ['Separador entre fuentes','Usa "===" entre cada bloque de fuente para facilitar el procesamiento.'],
-      ['Consistencia en participantes','Usa los mismos identificadores (P1, P2...) en todas las fuentes.'],
-      ['Síntesis inicial','Incluye al inicio una sección SÍNTESIS DE FUENTES describiendo el corpus total.'],
+  categorica:{
+    fname:'plantilla-categorica.csv',
+    rules:[
+      ['Variables de texto o números enteros','Para tablas de frecuencia y chi-cuadrado.'],
+      ['Columna "variable1" y "variable2"','Para tabla cruzada necesitas exactamente dos variables categóricas.'],
+      ['Sin espacios extra en las categorías','Escribe las etiquetas exactamente igual en todas las filas.'],
+      ['Una observación por fila','Cada fila es un caso o registro.'],
     ],
-    content: `# SÍNTESIS DE FUENTES
-
-TOTAL_FUENTES: [N]
-TIPOS: [Entrevistas: N | Observaciones: N | Documentos: N]
-PARTICIPANTES_ÚNICOS: [N]
-PERÍODO: [Fecha inicio — Fecha fin]
-FENÓMENO: [Breve descripción del fenómeno estudiado]
-
-===
-
-# FUENTE_01
-
-TIPO_FUENTE: ENTREVISTA
-TITULO: Entrevista a docente P1
-FECHA: [DD/MM/AAAA]
-PARTICIPANTES: P1 (docente área ciencias), E (investigador)
-
-P1: Cuando me dijeron que debía incorporar IA en mis clases, lo primero que sentí fue pánico. No por la tecnología en sí, sino por el tiempo que requería aprender.
-
-E: ¿Y cómo resolvió esa situación?
-
-P1: Me apoyé en colegas más jóvenes. Fue un aprendizaje entre pares, no institucional.
-
-===
-
-# FUENTE_02
-
-TIPO_FUENTE: OBSERVACIÓN
-TITULO: Sesión de clase — uso de herramienta IA
-FECHA: [DD/MM/AAAA]
-LUGAR: Aula virtual, plataforma Teams
-
-A1 (P1 en el aula) muestra inseguridad al demostrar la herramienta. Consulta el tutorial dos veces antes de mostrarla.
-
-===
-
-# FUENTE_03
-
-TIPO_FUENTE: DOCUMENTO
-TITULO: Plan de formación docente 2024
-FUENTE: Vicerrectoría Académica
-
-[CITA] "Se priorizará la capacitación en herramientas digitales para el 100% del cuerpo docente."
-
-Este enunciado contrasta con la experiencia reportada por P1 sobre la ausencia de formación institucional.
-
-===
-
-# TRIANGULACIÓN PRELIMINAR
-[Escribe aquí cómo se relacionan las tres fuentes entre sí — coincidencias, contradicciones, complementariedades]`
+    content:`# Plantilla: Variables categóricas\n\nid,sede,programa,genero,estrato\n1,Bogotá,Medicina,F,3\n2,Pereira,Enfermería,M,2\n3,Bogotá,Odontología,F,4\n4,Bogotá,Medicina,M,3\n5,Pereira,Medicina,F,2\n6,Pereira,Enfermería,F,3\n7,Bogotá,Odontología,M,4\n8,Pereira,Medicina,M,2`
+  },
+  reporte:{
+    fname:'plantilla-indicadores.csv',
+    rules:[
+      ['Columna de periodo o categoría','Primera columna: mes, año, sede, área, etc.'],
+      ['Columnas de indicadores numéricos','Cada indicador en su propia columna. Usa punto como decimal.'],
+      ['Sin fórmulas ni totales en el CSV','El sistema calcula totales y variaciones automáticamente.'],
+      ['Hasta 12 filas recomendadas','Para informes mensuales, un año completo es ideal.'],
+    ],
+    content:`# Plantilla: Indicadores de gestión / Reporte\n\nperiodo,matriculas,retención,deserción,graduados,ingresos_mm\nEne-2025,1250,88.2,11.8,42,840\nFeb-2025,1248,87.5,12.5,18,838\nMar-2025,1301,89.1,10.9,25,892\nAbr-2025,1289,88.8,11.2,31,876\nMay-2025,1312,90.2,9.8,29,905\nJun-2025,1298,89.5,10.5,87,894`
+  },
+  ventas:{
+    fname:'plantilla-series.csv',
+    rules:[
+      ['Columna de periodo en orden cronológico','Ene, Feb,... o T1, T2... o 2023, 2024...'],
+      ['Columnas de métricas numéricas','Ventas, unidades, tasa, índice — todas numéricas.'],
+      ['Sin celdas fusionadas','Un valor por celda, sin subtotales intermedios.'],
+      ['Al menos 6 períodos','Para que la tendencia tenga sentido estadístico.'],
+    ],
+    content:`# Plantilla: Series de tiempo / Tendencias\n\nperiodo,valor_actual,meta,variacion_pct\nT1-2024,4250,4000,6.25\nT2-2024,4580,4200,9.05\nT3-2024,4310,4400,-2.05\nT4-2024,5020,4600,9.13\nT1-2025,4890,4800,1.88\nT2-2025,5240,5000,4.80`
+  },
+  frecuencias:{
+    fname:'plantilla-frecuencias.csv',
+    rules:[
+      ['Columna de categoría','Nombre de cada categoría o respuesta posible.'],
+      ['Columna de frecuencia','Número de casos o conteo por categoría.'],
+      ['Sin encabezado de totales','No incluyas una fila "Total" al final.'],
+      ['Etiquetas exactas','Las categorías deben estar escritas igual en todas las filas.'],
+    ],
+    content:`# Plantilla: Frecuencias y conteos\n\ncategoria,frecuencia\nMuy satisfecho,42\nSatisfecho,61\nNeutral,28\nInsatisfecho,14\nMuy insatisfecho,5`
+  },
+  cruzado:{
+    fname:'plantilla-cruzada.csv',
+    rules:[
+      ['Dos columnas categóricas','"var1" y "var2" — son las dos variables a cruzar.'],
+      ['Una observación por fila','No ingreses ya la tabla cruzada, sino los datos crudos.'],
+      ['Categorías consistentes','Escribe las etiquetas exactamente igual en cada fila.'],
+      ['Mínimo 20 observaciones','Para que el chi-cuadrado sea válido.'],
+    ],
+    content:`# Plantilla: Tabla cruzada\n\nid,var1,var2\n1,Sede A,Satisfecho\n2,Sede B,Insatisfecho\n3,Sede A,Satisfecho\n4,Sede A,Neutral\n5,Sede B,Satisfecho\n6,Sede B,Neutral\n7,Sede A,Insatisfecho\n8,Sede B,Satisfecho`
   }
 };
 
-// ─── STEP NAVIGATION ─────────────────────────────────────
-function goStep(n) {
-  document.querySelectorAll('.panel').forEach((p,i)=>{ p.classList.toggle('active', i===n); });
-  document.querySelectorAll('.step-tab').forEach((t,i)=>{ t.classList.toggle('active', i===n); });
-  document.querySelectorAll('.sidebar .phase-btn').forEach((b,i)=>{ if(i<4) b.classList.toggle('active', i===n); });
-  document.getElementById('mainEl').scrollTo({top:0,behavior:'smooth'});
-}
-
-// ─── FORMAT SELECTION ────────────────────────────────────
-function selectFormat(fmt) {
-  selectedFormat = fmt;
-  document.querySelectorAll('.format-card').forEach(c=>c.classList.remove('selected'));
-  document.getElementById('fc-'+fmt).classList.add('selected');
+function selTemplate(t) {
+  TMPL = t;
+  document.querySelectorAll('.tmpl-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('tc-'+t)?.classList.add('sel');
   renderPreview();
 }
 
 function renderPreview() {
-  const t = TEMPLATES[selectedFormat];
-  document.getElementById('previewTitle').textContent = t.title;
+  const t = TEMPLATES[TMPL];
+  if(!t) return;
+  document.getElementById('previewFname').textContent = t.fname;
   document.getElementById('previewBody').textContent = t.content;
-
-  const rulesGrid = document.getElementById('rulesGrid');
-  rulesGrid.innerHTML = t.rules.map(([title,desc]) => `
-    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px">
-      <div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:4px">✓ ${title}</div>
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.6">${desc}</div>
-    </div>
-  `).join('');
+  document.getElementById('rulesGrid').innerHTML = t.rules.map(([title,desc])=>`
+    <div class="rule-item">
+      <div class="rule-title">✓ ${title}</div>
+      <div class="rule-desc">${desc}</div>
+    </div>`).join('');
 }
 
-function downloadTemplate(ext) {
-  const t = TEMPLATES[selectedFormat];
-  const blob = new Blob([t.content], {type:'text/plain;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = t.title.replace('.txt', '.'+ext);
-  a.click();
+function downloadTemplate() {
+  const t = TEMPLATES[TMPL];
+  if(!t) return;
+  const blob = new Blob([t.content.replace(/^#[^\n]+\n/gm,'').trim()], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = t.fname; a.click();
 }
 
-// ─── FILE HANDLING ────────────────────────────────────────
-const zone = document.getElementById('uploadZone');
-zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('drag-over'); });
-zone.addEventListener('dragleave', ()=>zone.classList.remove('drag-over'));
-zone.addEventListener('drop', e=>{ e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+// ══ NAVIGATION ══
+function goStep(n) {
+  document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('active',i===n));
+  document.querySelectorAll('.step-tab').forEach((t,i)=>t.classList.toggle('active',i===n));
+  ['sbStep0','sbStep1','sbStep2','sbStep3'].forEach((id,i)=>document.getElementById(id)?.classList.toggle('active',i===n));
+  document.getElementById('mainEl').scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('sidebarSections').style.display = n===3 ? 'block' : 'none';
+}
 
-function handleFiles(files) {
-  Array.from(files).forEach(f => {
-    const ext = f.name.split('.').pop().toLowerCase();
-    if (['txt','md'].includes(ext) && !uploadedFiles.find(x=>x.name===f.name)) {
-      uploadedFiles.push(f);
-    }
+function scrollSec(id) {
+  goStep(3);
+  setTimeout(()=>{ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },200);
+}
+
+// ══ INPUT TABS ══
+function setInputTab(t) {
+  document.getElementById('itab-file').classList.toggle('active',t==='file');
+  document.getElementById('itab-paste').classList.toggle('active',t==='paste');
+  document.getElementById('pane-file').style.display = t==='file'?'block':'none';
+  document.getElementById('pane-paste').style.display = t==='paste'?'block':'none';
+}
+
+// ══ FILE HANDLING ══
+const uz = document.getElementById('uploadZone');
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('dov')});
+uz.addEventListener('dragleave',()=>uz.classList.remove('dov'));
+uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('dov');handleFiles(e.dataTransfer.files)});
+
+async function handleFiles(files) {
+  const f = files[0]; if(!f) return;
+  const text = await f.text();
+  parseCSV(text, f.name);
+}
+
+function parsePaste() {
+  const text = document.getElementById('pasteArea').value.trim();
+  if(text.length>10) parseCSV(text, 'datos-pegados.csv');
+}
+
+function parseCSV(text, fname) {
+  text = text.replace(/^#[^\n]*\n/gm,'').trim();
+  const lines = text.split(/\r?\n/).filter(l=>l.trim()&&!l.startsWith('#'));
+  if(lines.length<2){ showAlert('alertBox1','El archivo debe tener al menos 1 encabezado y 1 fila de datos.','err'); return; }
+
+  const sep = detectSep(lines[0]);
+  headers = lines[0].split(sep).map(h=>h.trim().replace(/^["']|["']$/g,''));
+  rawData = lines.slice(1).map(line=>{
+    const vals = line.split(sep).map(v=>v.trim().replace(/^["']|["']$/g,''));
+    const obj = {};
+    headers.forEach((h,i)=>{ obj[h] = vals[i]||''; });
+    return obj;
+  }).filter(r=>Object.values(r).some(v=>v!==''));
+
+  numericCols = headers.filter(h=>{
+    const vals = rawData.map(r=>r[h]).filter(v=>v!=='');
+    const numCount = vals.filter(v=>!isNaN(parseFloat(v))).length;
+    return numCount/vals.length > 0.7;
   });
-  processFiles();
+
+  selectedCols = [...numericCols];
+  renderFileChip(fname);
+  renderDataPreview();
+  renderColSelector();
+  fillGroupVar();
+  document.getElementById('btnNext1').disabled = false;
 }
 
-async function processFiles() {
-  parsedData = [];
-  const vList = [];
-
-  for (const f of uploadedFiles) {
-    const text = await f.text();
-    const issues = validateFile(text, f.name);
-    parsedData.push({ name: f.name, content: text, issues });
-    if (issues.length) vList.push(...issues.map(i=>`${f.name}: ${i}`));
-  }
-
-  renderFilesList();
-
-  const vBox = document.getElementById('validationBox');
-  const vUl = document.getElementById('validationList');
-  if (vList.length) {
-    vBox.classList.add('show');
-    vUl.innerHTML = vList.map(v=>`<li>${v}</li>`).join('');
-  } else {
-    vBox.classList.remove('show');
-  }
-
-  document.getElementById('btnNext1').disabled = parsedData.length === 0;
+function detectSep(line) {
+  const counts = {',':(line.match(/,/g)||[]).length, ';':(line.match(/;/g)||[]).length, '\t':(line.match(/\t/g)||[]).length};
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
 }
 
-function validateFile(content, name) {
-  const issues = [];
-  if (content.length < 100) issues.push('El archivo parece muy corto (menos de 100 caracteres).');
-  if (!content.includes('FECHA') && !content.includes('TITULO') && !content.includes('PARTICIPANTES'))
-    issues.push('No se detectaron metadatos (TITULO, FECHA, PARTICIPANTES). Revisa la plantilla.');
-  if (content.length > 200000) issues.push('Archivo muy extenso — se analizarán los primeros 200.000 caracteres.');
-  return issues;
-}
-
-function renderFilesList() {
-  const el = document.getElementById('filesList');
-  el.innerHTML = uploadedFiles.map((f,i) => {
-    const pd = parsedData[i];
-    const status = pd?.issues?.length
-      ? `<span class="file-item-err">⚠ ${pd.issues.length} observación(es)</span>`
-      : `<span class="file-item-status">✓ Listo</span>`;
-    return `<div class="file-item">
-      <span class="file-item-icon">${f.name.endsWith('.md')?'📝':'📄'}</span>
-      <span class="file-item-name">${f.name}</span>
-      ${status}
-      <span class="file-item-size">${fmtSize(f.size)}</span>
-      <button class="file-item-remove" onclick="removeFile(${i})">×</button>
+function renderFileChip(fname) {
+  document.getElementById('filesList').innerHTML=`
+    <div class="file-chip">
+      <span>📄</span>
+      <span class="fc-name">${fname}</span>
+      <span class="fc-ok">✓ ${rawData.length} filas · ${headers.length} columnas</span>
     </div>`;
-  }).join('');
 }
 
-function removeFile(i) {
-  uploadedFiles.splice(i,1);
-  parsedData.splice(i,1);
-  renderFilesList();
-  document.getElementById('btnNext1').disabled = uploadedFiles.length===0;
+function renderDataPreview() {
+  const el = document.getElementById('previewSection');
+  const tbl = document.getElementById('previewTable');
+  const preview = rawData.slice(0,5);
+  el.style.display = 'block';
+  document.getElementById('previewCount').textContent = `${rawData.length} filas, ${headers.length} columnas`;
+  tbl.innerHTML = `<thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${preview.map(r=>`<tr>${headers.map(h=>`<td class="${numericCols.includes(h)?'num':''}">${r[h]}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  document.getElementById('colTypes').textContent = `Columnas numéricas detectadas: ${numericCols.join(', ')||'Ninguna'}`;
 }
 
-function fmtSize(b) {
-  if(b<1024) return b+' B';
-  if(b<1048576) return (b/1024).toFixed(1)+' KB';
-  return (b/1048576).toFixed(1)+' MB';
+function renderColSelector() {
+  document.getElementById('colSelector').innerHTML = headers.map(h=>`
+    <div class="col-chip ${selectedCols.includes(h)?'sel':''}" id="chip-${h}" onclick="toggleCol('${h}')">
+      ${h} <span class="ct">${numericCols.includes(h)?'NUM':'TXT'}</span>
+    </div>`).join('');
 }
 
-// ─── ANALYSIS ENGINE ─────────────────────────────────────
+function toggleCol(h) {
+  if(selectedCols.includes(h)) selectedCols = selectedCols.filter(c=>c!==h);
+  else selectedCols.push(h);
+  document.getElementById('chip-'+h)?.classList.toggle('sel', selectedCols.includes(h));
+}
+
+function fillGroupVar() {
+  const sel = document.getElementById('groupVar');
+  sel.innerHTML = '<option value="">— Ninguna —</option>';
+  headers.filter(h=>!numericCols.includes(h)||rawData.map(r=>r[h]).filter((v,i,a)=>a.indexOf(v)===i).length<=10)
+    .forEach(h=>{ const o=document.createElement('option'); o.value=h; o.textContent=h; sel.appendChild(o); });
+}
+
+function showAlert(id,msg,type) {
+  const el=document.getElementById(id);
+  el.className='alert '+type;
+  el.textContent=msg;
+  setTimeout(()=>el.className='alert',5000);
+}
+
+// ══ ANALYSIS ══
 function runAnalysis() {
-  const question = document.getElementById('fQuestion').value.trim();
-  const objectives = document.getElementById('fObjectives').value.trim();
-  if (!question || !objectives) {
-    const al = document.getElementById('alertBox2');
-    al.className='alert show-error'; al.textContent='La pregunta de investigación y los objetivos son obligatorios.';
-    setTimeout(()=>al.className='alert',5000); return;
-  }
+  const titleEl = MODE==='inv' ? document.getElementById('studyTitle') : document.getElementById('repTitle');
+  if(!titleEl.value.trim()){ showAlert('alertBox2','El título es obligatorio.','err'); return; }
+  if(selectedCols.filter(c=>numericCols.includes(c)).length===0){ showAlert('alertBox2','Selecciona al menos una columna numérica.','err'); return; }
 
   goStep(3);
   document.getElementById('emptyState').style.display='none';
   document.getElementById('resultsArea').style.display='none';
 
-  const container = document.getElementById('phasesContainer');
-  container.innerHTML = `<div class="loading-panel">
-    <div class="spinner"></div>
-    <div class="loading-msg">Procesando corpus cualitativo…</div>
-    <div class="loading-sub" id="lSub">Leyendo archivos</div>
-    <div class="prog-bar"><div class="prog-fill" id="lFill" style="width:5%"></div></div>
-  </div>`;
+  const rc = document.getElementById('resultsContainer');
+  rc.innerHTML=`<div class="loading-panel"><div class="spinner"></div>
+    <div style="font-size:14px;color:var(--text3)">Calculando estadísticos…</div>
+    <div style="font-size:12px;color:var(--teal);margin-top:6px" id="lSub">Inicializando</div>
+    <div class="prog-bar"><div class="prog-fill" id="lFill" style="width:5%"></div></div></div>`;
 
-  setTimeout(()=>doAnalysis(question, objectives), 50);
+  setTimeout(()=>compute(), 60);
 }
 
-function setProgress(msg, pct) {
-  const s=document.getElementById('lSub'), f=document.getElementById('lFill');
-  if(s) s.textContent=msg;
-  if(f) f.style.width=pct+'%';
+function setP(msg,pct){
+  const s=document.getElementById('lSub'),f=document.getElementById('lFill');
+  if(s)s.textContent=msg; if(f)f.style.width=pct+'%';
 }
 
-function doAnalysis(question, objectives) {
-  const theory = document.getElementById('fTheory').value.trim();
-  const method = document.getElementById('fMethod').value.trim();
-  const participants = document.getElementById('fParticipants').value.trim();
-  const context = document.getElementById('fContext').value.trim();
+function num(v){ return parseFloat(v); }
+function isNum(v){ return v!==''&&!isNaN(parseFloat(v)); }
+function getCol(col){ return rawData.map(r=>r[col]).filter(isNum).map(num); }
 
-  setProgress('Construyendo corpus…', 15);
+// ── Statistics ──
+function mean(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function median(arr){ const s=[...arr].sort((a,b)=>a-b),n=s.length; return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2; }
+function mode(arr){ const m={}; arr.forEach(v=>{m[v]=(m[v]||0)+1;}); const max=Math.max(...Object.values(m)); const modes=Object.keys(m).filter(k=>m[k]===max); return modes.length===arr.length?null:modes.map(Number); }
+function variance(arr,pop=false){ const m=mean(arr); return arr.reduce((s,v)=>s+(v-m)**2,0)/(arr.length-(pop?0:1)); }
+function stdDev(arr,pop=false){ return Math.sqrt(variance(arr,pop)); }
+function skewness(arr){ const m=mean(arr),s=stdDev(arr),n=arr.length; return (n/((n-1)*(n-2)))*arr.reduce((a,v)=>a+((v-m)/s)**3,0); }
+function kurtosis(arr){ const m=mean(arr),s=stdDev(arr),n=arr.length; const k=arr.reduce((a,v)=>a+((v-m)/s)**4,0)/n; return k-3; }
+function pearson(a,b){ const ma=mean(a),mb=mean(b),n=a.length; const num=a.reduce((s,v,i)=>s+(v-ma)*(b[i]-mb),0); const den=Math.sqrt(a.reduce((s,v)=>s+(v-ma)**2,0)*b.reduce((s,v)=>s+(v-mb)**2,0)); return den?num/den:0; }
 
-  // Merge all files
-  const corpus = parsedData.map(f => f.content.slice(0,200000)).join('\n\n===SIGUIENTE FUENTE===\n\n');
+// CDF de la t de Student (aproximación por serie de la beta incompleta regularizada)
+function tCDF(t,df){
+  const x=df/(df+t*t), a=df/2, b=0.5;
+  const bt=Math.exp(a*Math.log(x)+b*Math.log(1-x));
+  let sum=0, term=1;
+  for(let i=0;i<200;i++){ term*=(a+i)*(1-x)/(i+1+b); sum+=term/(a+i+1); if(Math.abs(term)<1e-9) break; }
+  return 1-bt*(1+sum*(b+a)/b)/2;
+}
+function pFromT(t,df){ return Math.max(0.001, 2*(1-tCDF(Math.abs(t),df))); }
 
-  setProgress('Extrayendo participantes…', 25);
-  const actors = extractActors(corpus);
-
-  setProgress('Codificando datos…', 40);
-  const codes = extractCodes(corpus);
-
-  setProgress('Construyendo categorías…', 55);
-  const categories = buildCategories(codes, corpus);
-
-  setProgress('Identificando evidencias…', 70);
-  const quotes = extractQuotes(corpus, actors);
-
-  setProgress('Evaluando rigor científico…', 85);
-  const rigor = assessRigor(corpus, parsedData.length, actors.length, quotes.length);
-
-  setProgress('Generando informe…', 95);
-
-  const result = {
-    meta: { question, objectives, theory, method, participants, context },
-    actors,
-    codes,
-    categories,
-    quotes,
-    rigor,
-    corpus,
-    srcCount: parsedData.length,
-    charCount: corpus.length
-  };
-
-  setTimeout(()=>renderResults(result), 300);
+function shapiroApprox(arr){
+  const n=arr.length;
+  if(n<3) return{W:1,p:1};
+  const s=[...arr].sort((a,b)=>a-b);
+  const m=mean(s);
+  const sd=stdDev(s)||1;
+  const b2=s.reduce((a,v)=>a+(v-m)**3,0)/(n*sd**3);
+  const W=1-Math.min(1,(b2**2)*n/6);
+  const p=Math.max(0.001,Math.min(0.999,1-Math.abs(W-0.95)*10));
+  return{W:+W.toFixed(4),p:+p.toFixed(3)};
 }
 
-// ─── EXTRACTION FUNCTIONS ─────────────────────────────────
-
-function extractActors(corpus) {
-  const map = {};
-  // Matches: P1:, P2:, E:, A1:, A2:, DOCENTE:, etc.
-  const re = /^([A-ZÁÉÍÓÚ][A-ZÁÉÍÓÚa-záéíóú0-9_\-]{0,15})\s*:/gm;
-  let m;
-  while((m=re.exec(corpus))!==null) {
-    const k = m[1].trim();
-    map[k] = (map[k]||0)+1;
-  }
-  return Object.entries(map)
-    .filter(([k,v])=>v>=2)
-    .sort((a,b)=>b[1]-a[1])
-    .map(([id,freq])=>({id, freq}));
+function tTest(a,b){
+  const na=a.length,nb=b.length,ma=mean(a),mb=mean(b),va=variance(a),vb=variance(b);
+  const se=Math.sqrt(va/na+vb/nb);
+  const t=(ma-mb)/se;
+  const df=((va/na+vb/nb)**2)/((va/na)**2/(na-1)+(vb/nb)**2/(nb-1));
+  const p=pFromT(t,Math.round(df));
+  const d=Math.abs(ma-mb)/Math.sqrt((va*(na-1)+vb*(nb-1))/(na+nb-2));
+  return{t:+t.toFixed(3),df:+df.toFixed(1),p:+p.toFixed(3),d:+d.toFixed(3)};
 }
 
-function extractCodes(corpus) {
-  const lc = corpus.toLowerCase();
-  const SEED_CODES = [
-    {code:'RESIST_CAMBIO', terms:['resistencia','resistir','miedo','rechazo','no quiero','no me gusta','difícil','complicado','complicada','pánico','temor'], label:'Resistencia al cambio'},
-    {code:'APREND_AUTOPROPULSADO', terms:['autodidacta','solo','por mi cuenta','yo mismo','auto','autoaprendizaje','sin ayuda','aprendí solo'], label:'Aprendizaje autónomo'},
-    {code:'APOYO_INSTITUCIONAL', terms:['institución','institucional','apoyo','capacitación','formación','rector','directivo','política','recursos'], label:'Apoyo institucional'},
-    {code:'COMPET_DIGITAL', terms:['tecnología','digital','herramienta','plataforma','app','software','competencia digital','manejo','habilidad'], label:'Competencia digital'},
-    {code:'EXPERIENCIA_POSITIVA', terms:['oportunidad','beneficio','útil','funciona','mejor','mejoró','positivo','ventaja','ayuda'], label:'Experiencia positiva'},
-    {code:'BRECHA_GENERACIONAL', terms:['joven','mayor','generación','edad','antiguo','nuevo','años de experiencia','veterano'], label:'Brecha generacional'},
-    {code:'IMPACTO_PEDAGÓGICO', terms:['estudiante','aula','clase','enseñanza','aprendizaje','pedagógi','didácti','currículo'], label:'Impacto pedagógico'},
-    {code:'IDENTIDAD_PROFESIONAL', terms:['identidad','rol','profesión','vocación','yo como docente','mi forma de enseñar','autonomía'], label:'Identidad profesional'},
-    {code:'CONTEXTO_INSTITUCIONAL', terms:['universidad','facultad','departamento','sede','rectoría','vicerrectoría','decano'], label:'Contexto institucional'},
-    {code:'COMUNICACION_PARES', terms:['compañero','colega','par','entre nosotros','compartir','comunidad','red','trabajo en equipo'], label:'Comunicación entre pares'},
-    {code:'TIEMPO_RECURSO', terms:['tiempo','recurso','presupuesto','inversión','falta de tiempo','no hay','sin recursos'], label:'Tiempo y recursos'},
-    {code:'EMOCIONES', terms:['sentí','siento','emoción','frustración','motivación','entusiasmo','ansiedad','estrés','feliz','preocupa'], label:'Emociones y afectos'},
-  ];
-
-  return SEED_CODES.map(seed => {
-    let count = 0;
-    const fragments = [];
-    seed.terms.forEach(term => {
-      let idx = lc.indexOf(term);
-      while(idx !== -1) {
-        count++;
-        if(fragments.length < 2) {
-          const start = Math.max(0,idx-60);
-          const end = Math.min(corpus.length,idx+term.length+80);
-          fragments.push(corpus.slice(start,end).replace(/\n/g,' ').trim());
-        }
-        idx = lc.indexOf(term, idx+1);
-      }
-    });
-    const freq = count === 0 ? 'ausente' : count <= 2 ? 'baja' : count <= 6 ? 'media' : 'alta';
-    return { code: seed.code, label: seed.label, count, freq, fragments };
-  }).filter(c=>c.count>0).sort((a,b)=>b.count-a.count);
+function cronbachAlpha(cols){
+  const ncols=cols.length;
+  if(ncols<2) return null;
+  const varItems=cols.map(c=>variance(getCol(c)));
+  const totalScores=rawData.map(r=>cols.reduce((s,c)=>{ const v=parseFloat(r[c]); return s+(isNaN(v)?0:v); },0));
+  const varTotal=variance(totalScores);
+  if(!varTotal) return null;
+  return+(ncols/(ncols-1)*(1-varItems.reduce((a,v)=>a+v,0)/varTotal)).toFixed(3);
 }
 
-function buildCategories(codes, corpus) {
-  const CATEGORY_MAP = [
-    {
-      cat: 'Actitudes y disposiciones frente al cambio',
-      codes: ['RESIST_CAMBIO','EXPERIENCIA_POSITIVA','EMOCIONES','BRECHA_GENERACIONAL'],
-      desc: 'Agrupa las respuestas emocionales, actitudinales y disposicionales de los actores ante la introducción de cambios o innovaciones.'
-    },
-    {
-      cat: 'Condiciones institucionales y de soporte',
-      codes: ['APOYO_INSTITUCIONAL','CONTEXTO_INSTITUCIONAL','TIEMPO_RECURSO'],
-      desc: 'Comprende los factores estructurales, organizacionales y de recursos que median la experiencia de los participantes.'
-    },
-    {
-      cat: 'Prácticas de aprendizaje y desarrollo profesional',
-      codes: ['APREND_AUTOPROPULSADO','COMUNICACION_PARES','COMPET_DIGITAL'],
-      desc: 'Refleja las estrategias que los actores despliegan para adquirir y fortalecer sus competencias de manera formal e informal.'
-    },
-    {
-      cat: 'Identidad y rol profesional',
-      codes: ['IDENTIDAD_PROFESIONAL','IMPACTO_PEDAGÓGICO'],
-      desc: 'Abarca las percepciones y representaciones sobre sí mismos en el ejercicio de su práctica profesional y su relación con la innovación.'
-    }
-  ];
-
-  return CATEGORY_MAP.map(cat => {
-    const relCodes = codes.filter(c => cat.codes.includes(c.code));
-    const totalCount = relCodes.reduce((s,c)=>s+c.count,0);
-    const subcats = relCodes.map(c => c.label);
-    return { ...cat, relCodes, totalCount, subcats };
-  }).filter(c=>c.totalCount>0);
+function linearRegression(x,y){
+  const n=x.length,mx=mean(x),my=mean(y);
+  const b1=x.reduce((s,v,i)=>s+(v-mx)*(y[i]-my),0)/x.reduce((s,v)=>s+(v-mx)**2,0);
+  const b0=my-b1*mx;
+  const r=pearson(x,y);
+  const r2=r*r;
+  const pred=x.map(v=>b0+b1*v);
+  const sse=y.reduce((s,v,i)=>s+(v-pred[i])**2,0);
+  const se=Math.sqrt(sse/(n-2));
+  return{b0:+b0.toFixed(4),b1:+b1.toFixed(4),r:+r.toFixed(3),r2:+r2.toFixed(3),se:+se.toFixed(3)};
 }
 
-function extractQuotes(corpus, actors) {
-  const quotes = [];
-  // Extract dialogue lines: "P1: texto..." or lines with [CITA]
-  const lineRe = /^([A-ZÁÉÍÓÚ][A-ZÁÉÍÓÚa-záéíóú0-9_\-]{0,15})\s*:\s*(.{40,300})/gm;
-  let m;
-  while((m=lineRe.exec(corpus))!==null && quotes.length<12) {
-    quotes.push({ actor: m[1].trim(), text: m[2].trim() });
-  }
-  // Also pick [CITA] blocks
-  const citaRe = /\[CITA\]\s*[""]?(.{30,280})[""]?/g;
-  while((m=citaRe.exec(corpus))!==null && quotes.length<15) {
-    quotes.push({ actor: 'Documento', text: m[1].trim() });
-  }
-  return quotes.slice(0,10);
+// ── Charts ──
+function destroyCharts(){ charts.forEach(c=>c.destroy()); charts=[]; }
+
+function makeChart(canvasId, type, labels, datasets, opts={}){
+  const ctx=document.getElementById(canvasId)?.getContext('2d');
+  if(!ctx) return;
+  const palette=['#1A8C7A','#3D52B0','#B86E00','#C13030','#1F7A4A','#7B3DB0'];
+  datasets = datasets.map((d,i)=>({backgroundColor:palette[i%palette.length]+'33',borderColor:palette[i%palette.length],borderWidth:2,pointRadius:3,...d}));
+  const c=new Chart(ctx,{type,data:{labels,datasets},options:{responsive:true,plugins:{legend:{labels:{font:{family:'Inter',size:11}}}},...opts}});
+  charts.push(c);
 }
 
-function assessRigor(corpus, srcCount, actorCount, quoteCount) {
-  const len = corpus.length;
-  const credLevel = (srcCount>=2 && quoteCount>=5 && len>2000) ? 'alto' : (len>800) ? 'medio' : 'bajo';
-  const transLevel = srcCount>=2 ? 'medio' : 'bajo';
-  const depLevel = len>3000 ? 'medio' : 'bajo';
-  const confLevel = quoteCount>=5 ? 'alto' : quoteCount>=2 ? 'medio' : 'bajo';
+// ── MAIN COMPUTE ──
+function compute(){
+  destroyCharts();
+  const numSelected = selectedCols.filter(c=>numericCols.includes(c));
+  const groupVar = document.getElementById('groupVar')?.value||'';
+  const alpha = parseFloat(document.getElementById('alphaLevel')?.value||'0.05');
+  const likertScale = parseInt(document.getElementById('likertScale')?.value||'0');
+  const titleVal = MODE==='inv'
+    ? (document.getElementById('studyTitle').value||'Informe de análisis cuantitativo')
+    : (document.getElementById('repTitle').value||'Informe de datos');
 
-  return {
-    credibilidad: { nivel: credLevel, desc: credLevel==='alto'
-      ? `El corpus cuenta con ${srcCount} fuente(s), ${actorCount} actor(es) identificado(s) y ${quoteCount} fragmentos directos, lo que permite triangulación y sustento empírico.`
-      : `El análisis se basa en ${srcCount} fuente(s). Se recomienda ampliar con más participantes y sesiones para fortalecer la credibilidad.` },
-    transferibilidad: { nivel: transLevel, desc: srcCount>=2
-      ? 'La presencia de múltiples fuentes y actores favorece la posibilidad de transferir los hallazgos a contextos similares, sujeto a descripción densa del contexto.'
-      : 'Con una sola fuente, la transferibilidad es limitada. Se sugiere descripción densa del contexto para facilitar la aplicación en otros escenarios.' },
-    dependabilidad: { nivel: depLevel, desc: len>3000
-      ? 'La extensión del corpus y la estructura de los datos permiten verificar la consistencia del proceso de codificación y categorización.'
-      : 'La extensión del corpus es limitada. Se recomienda documentar el proceso metodológico detalladamente para garantizar la dependabilidad.' },
-    confirmabilidad: { nivel: confLevel, desc: confLevel==='alto'
-      ? `Las ${quoteCount} evidencias textuales identificadas permiten anclar las interpretaciones en los datos, reduciendo el sesgo del investigador.`
-      : 'Se recomienda aumentar la inclusión de evidencias textuales directas para fortalecer la confirmabilidad y reducir la subjetividad interpretativa.' }
-  };
-}
+  setP('Descriptivos…',20);
+  const desc = computeDescriptives(numSelected);
 
-// ─── RENDER RESULTS ───────────────────────────────────────
-function renderResults(r) {
-  document.getElementById('phasesContainer').innerHTML='';
+  setP('Distribución y normalidad…',40);
+  const dist = computeDistribution(numSelected);
+
+  setP('Correlaciones…',55);
+  const corr = numSelected.length>=2 ? computeCorrelations(numSelected) : null;
+
+  setP('Pruebas inferenciales…',70);
+  const inf = computeInferential(numSelected, groupVar, alpha);
+
+  setP('Likert y escala…',82);
+  const lik = likertScale>0 ? computeLikert(numSelected, likertScale) : null;
+
+  setP('Regresión…',90);
+  const reg = numSelected.length>=2 ? computeRegression(numSelected) : null;
+
+  setP('Renderizando…',97);
+
+  document.getElementById('resTitle').textContent = titleVal;
+
+  const rc = document.getElementById('resultsContainer');
+  rc.innerHTML='';
   document.getElementById('resultsArea').style.display='block';
 
-  const container = document.getElementById('phasesContainer');
+  addCard(rc,'s-desc','E1','Estadística descriptiva', renderDescriptives(desc, numSelected));
+  addCard(rc,'s-dist','E2','Distribución y normalidad', renderDistribution(dist, numSelected));
+  if(corr) addCard(rc,'s-corr','E3','Matriz de correlaciones', renderCorrelations(corr, numSelected));
+  addCard(rc,'s-inf','E4','Pruebas inferenciales', renderInferential(inf, groupVar, alpha));
+  if(lik){ addCard(rc,'s-lik','E5','Análisis de escala Likert', renderLikert(lik, numSelected, likertScale)); document.getElementById('sb-likert-btn').style.display='flex'; }
+  if(reg && numSelected.length>=2){ addCard(rc,'s-fact','E6','Regresión lineal simple', renderRegression(reg, numSelected)); document.getElementById('sb-fact-btn').style.display='flex'; }
+  addCard(rc,'s-conc','E7','Síntesis y conclusiones', renderConclusions(desc, corr, inf, lik, titleVal, alpha));
 
-  addPhaseCard(container, 1, 'Organización de la información', renderF1(r));
-  addPhaseCard(container, 2, 'Codificación de los datos', renderF2(r));
-  addPhaseCard(container, 3, 'Categorización', renderF3(r));
-  addPhaseCard(container, 4, 'Interpretación de los hallazgos', renderF4(r));
-  addPhaseCard(container, 5, 'Relación con el marco teórico', renderF5(r));
-  addPhaseCard(container, 6, 'Uso de evidencias', renderF6(r));
-  addPhaseCard(container, 7, 'Rigor científico', renderF7(r));
-  addPhaseCard(container, 8, 'Presentación de resultados', renderF8(r));
-
-  analysisResult = r;
+  setTimeout(()=>buildCharts(desc,dist,corr,numSelected),150);
 }
 
-function addPhaseCard(container, num, title, html) {
-  const d = document.createElement('div');
-  d.className = 'phase-card';
-  d.id = `pc-${num}`;
-  d.innerHTML = `
-    <div class="phase-card-hdr" onclick="toggleCard(${num})">
-      <div class="phase-card-num">${num}</div>
-      <div class="phase-card-title">${title}</div>
-      <div class="phase-card-toggle">▾</div>
-    </div>
-    <div class="phase-card-body"><div class="ac">${html}</div></div>`;
+function addCard(container, id, badge, title, html){
+  const d=document.createElement('div');
+  d.className='res-card'; d.id=id;
+  d.innerHTML=`<div class="rc-head" onclick="this.parentElement.classList.toggle('col')">
+    <span class="rc-badge">${badge}</span>
+    <span class="rc-title">${title}</span>
+    <span class="rc-toggle">▾</span>
+  </div><div class="rc-body"><div class="ac">${html}</div></div>`;
   container.appendChild(d);
 }
 
-function toggleCard(n) { document.getElementById(`pc-${n}`).classList.toggle('collapsed'); }
-function scrollPhase(n) {
-  goStep(3);
-  setTimeout(()=>{ const el=document.getElementById(`pc-${n}`); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },200);
-}
-
-function renderF1(r) {
-  const srcList = parsedData.map(f=>`<li><strong>${f.name}</strong> — ${fmtSize(f.content?.length||0)} · ${f.issues?.length?'<span style="color:var(--amber)">'+f.issues.length+' observación(es)</span>':'<span style="color:var(--green)">sin observaciones</span>'}</li>`).join('');
-  return `
-    <h3>Descripción del corpus</h3>
-    <p>El corpus analizado se compone de <strong>${r.srcCount} fuente(s)</strong> con un total de <strong>${r.charCount.toLocaleString('es-CO')} caracteres</strong>. Se identificaron <strong>${r.actors.length} actor(es) o participante(s)</strong> con intervenciones recurrentes.</p>
-    <ul>${srcList}</ul>
-    <h3>Actores / Participantes identificados</h3>
-    <p>${r.actors.length ? r.actors.map(a=>`<span class="code-chip">${a.id} <span style="opacity:0.7">(${a.freq})</span></span>`).join(' ') : 'No se identificaron participantes con formato de identificador estándar. Verifica que las intervenciones usen el formato P1:, E:, A1:, etc.'}</p>
-    <h3>Calidad y pertinencia</h3>
-    <p>Los datos ${r.charCount>2000?'presentan una extensión adecuada para el análisis cualitativo':'son breves; se recomienda ampliar el corpus para un análisis más robusto'}. ${r.actors.length>=2?'La presencia de múltiples actores favorece la triangulación de perspectivas.':'Con un solo actor o fuente, el análisis se centrará en la profundidad más que en la diversidad de perspectivas.'}</p>`;
-}
-
-function renderF2(r) {
-  const chips = r.codes.map(c => `
-    <div style="border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;background:var(--white)">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
-        <span class="code-chip">${c.code}</span>
-        <span class="freq-badge" style="background:${c.freq==='alta'?'var(--green)':c.freq==='media'?'var(--amber)':'var(--slate)'}">${c.freq}</span>
-        <span style="font-size:12px;color:var(--text-muted)">${c.count} ocurrencia(s)</span>
-      </div>
-      <p style="font-size:14px;margin-bottom:6px;color:var(--text-secondary)">${c.label}</p>
-      ${c.fragments[0]?`<blockquote style="margin:0;font-size:13px">…${c.fragments[0].slice(0,160)}…</blockquote>`:''}
-    </div>`).join('');
-  return `
-    <h3>Proceso de codificación</h3>
-    <p>Se aplicó una codificación basada en búsqueda sistemática de términos asociados a conceptos clave del fenómeno cualitativo. Se identificaron <strong>${r.codes.length} códigos</strong> con presencia efectiva en el corpus.</p>
-    <h3>Códigos identificados</h3>
-    ${chips||'<p>No se detectaron patrones codificables con los descriptores predefinidos. Verifica que el archivo siga la plantilla proporcionada.</p>'}`;
-}
-
-function renderF3(r) {
-  const cats = r.categories.map(c => `
-    <div style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:14px;background:var(--white)">
-      <div style="margin-bottom:10px"><span class="cat-tag" style="font-size:14px;padding:5px 14px">${c.cat}</span></div>
-      <p style="font-size:14px;margin-bottom:10px">${c.desc}</p>
-      <div style="margin-bottom:8px"><strong>Subcategorías:</strong> ${c.subcats.map(s=>`<span class="cat-tag" style="background:var(--cream);color:var(--navy)">${s}</span>`).join('')}</div>
-      <div><strong>Códigos:</strong> ${c.relCodes.map(cd=>`<span class="code-chip">${cd.code}</span>`).join('')}</div>
-    </div>`).join('');
-  return `
-    ${cats||'<p>No se construyeron categorías — revisa que el corpus contenga suficiente información codificable.</p>'}
-    <h3>Relaciones entre categorías</h3>
-    <p>Las categorías identificadas no son mutuamente excluyentes: las <em>actitudes y disposiciones</em> se ven influenciadas por las <em>condiciones institucionales</em>, mientras que las <em>prácticas de desarrollo profesional</em> actúan como respuesta adaptativa tanto a las limitaciones institucionales como a la presión identitaria.</p>`;
-}
-
-function renderF4(r) {
-  const topCats = r.categories.slice(0,3).map(c=>c.cat).join('; ');
-  const topCodes = r.codes.slice(0,4).map(c=>c.label).join(', ');
-  return `
-    <h3>Hallazgos principales</h3>
-    <p>El análisis del corpus evidencia que los principales ejes temáticos del fenómeno estudiado se articulan en torno a: ${topCats||'las categorías identificadas en la fase anterior'}. Estas dimensiones emergen de forma reiterada en las distintas fuentes analizadas.</p>
-    <h3>Significados e interpretaciones</h3>
-    <p>Los datos cualitativos revelan que el fenómeno estudiado es <strong>multidimensional</strong>: las dimensiones individuales (actitudinales, emocionales, identitarias) se entrelazan con factores estructurales e institucionales. Los conceptos más frecuentes — ${topCodes} — sugieren una tensión entre las disposiciones de los actores y las condiciones del entorno.</p>
-    <h3>Relación con los objetivos</h3>
-    <p>Los hallazgos responden a la pregunta de investigación planteada ("<em>${r.meta.question}</em>") al identificar tanto las dimensiones subjetivas como las condicionantes estructurales del fenómeno. El análisis permite avanzar hacia los objetivos: ${r.meta.objectives}.</p>
-    <h3>Contribución al fenómeno estudiado</h3>
-    <p>El corpus analizado aporta evidencia sobre cómo los actores construyen significados en torno al fenómeno desde su posición situada, lo que enriquece la comprensión de sus lógicas de acción y resistencia.</p>`;
-}
-
-function renderF5(r) {
-  const theory = r.meta.theory || 'No especificado — se realiza un análisis inductivo desde los datos';
-  return `
-    <h3>Coincidencias con el marco teórico</h3>
-    <p>Los hallazgos son consistentes con los postulados del marco de referencia (${theory}). En particular, los patrones de resistencia al cambio, la búsqueda de autonomía y la mediación del contexto institucional son dimensiones reconocidas en la literatura sobre el fenómeno.</p>
-    <h3>Diferencias o tensiones</h3>
-    <p>El análisis del corpus revela matices que tensionan las perspectivas teóricas convencionales: la agencia de los actores emerge de forma más compleja que lo previsto por modelos lineales, con estrategias de adaptación que no siempre siguen los patrones descritos en la literatura.</p>
-    <h3>Aportes novedosos</h3>
-    <p>El presente estudio aporta evidencia empírica contextualizada sobre cómo el fenómeno se manifiesta en el escenario específico analizado, enriqueciendo la comprensión teórica con elementos locales y situados.</p>
-    <h3>Sustento conceptual</h3>
-    <p>Las interpretaciones se fundamentan en los datos del corpus, siguiendo principios de la investigación cualitativa rigurosa: se prioriza la voz de los actores sobre las categorías previas del investigador, garantizando la anclatura empírica de cada conclusión.</p>`;
-}
-
-function renderF6(r) {
-  const citas = r.quotes.slice(0,6).map(q=>`
-    <div style="margin-bottom:18px">
-      <blockquote>"${escHtml(q.text)}"</blockquote>
-      <p style="font-size:13px;color:var(--text-muted);margin-top:4px;padding-left:4px">— ${q.actor} (anonimizado)</p>
-    </div>`).join('');
-  return `
-    ${citas||'<p>No se identificaron fragmentos con el formato de intervención estándar. Asegúrate de usar identificadores como P1:, E:, A1: en cada línea de intervención.</p>'}
-    <h3>Nota de confidencialidad</h3>
-    <p>Todas las citas presentadas han sido anonimizadas mediante el uso de identificadores genéricos (P1, P2, etc.). Ningún dato que permita identificar a los participantes es incluido en el informe, conforme a los principios éticos de la investigación cualitativa.</p>`;
-}
-
-function renderF7(r) {
-  const items = [
-    {key:'credibilidad',label:'Credibilidad'},
-    {key:'transferibilidad',label:'Transferibilidad'},
-    {key:'dependabilidad',label:'Dependabilidad'},
-    {key:'confirmabilidad',label:'Confirmabilidad'},
-  ];
-  const grid = items.map(({key,label})=>{
-    const it = r.rigor[key];
-    const n = (it.nivel||'bajo').toLowerCase();
-    const dots=[1,2,3].map(i=>`<div class="rigor-dot ${(n==='alto'&&i<=3)||(n==='medio'&&i<=2)||(n==='bajo'&&i<=1)?'filled':''}"></div>`).join('');
-    return `<div class="rigor-item"><div class="rigor-label">${label}</div><div class="rigor-dots">${dots}</div><div class="rigor-text">${it.desc}</div></div>`;
-  }).join('');
-  return `<div class="rigor-grid">${grid}</div>`;
-}
-
-function renderF8(r) {
-  const catNames = r.categories.map(c=>`<li>${c.cat}: ${c.subcats.slice(0,3).join(', ')}</li>`).join('');
-  const codeNames = r.codes.slice(0,6).map(c=>`<span class="code-chip">${c.code}</span>`).join(' ');
-  return `
-    <h3>Descripción de los datos recolectados</h3>
-    <p>El estudio se basó en ${r.srcCount} fuente(s) de datos cualitativos con un total de ${r.charCount.toLocaleString('es-CO')} caracteres, provenientes de ${r.actors.length} actor(es)/participante(s) identificado(s).</p>
-    <h3>Síntesis de la codificación</h3>
-    <p>Se identificaron <strong>${r.codes.length} códigos</strong> con presencia efectiva en el corpus: ${codeNames}. Los códigos de mayor frecuencia señalan las dimensiones dominantes del fenómeno.</p>
-    <h3>Construcción de categorías</h3>
-    <p>Los códigos se agruparon en <strong>${r.categories.length} categorías analíticas</strong>:</p><ul>${catNames}</ul>
-    <h3>Interpretación</h3>
-    <p>El análisis revela un fenómeno atravesado por tensiones entre la dimensión individual (actitudes, emociones, identidad) y la dimensión estructural (condiciones institucionales, recursos, cultura organizacional). Los actores desarrollan estrategias de adaptación situadas.</p>
-    <h3>Relación con la teoría</h3>
-    <p>Los hallazgos dialogan con el marco teórico de referencia (${r.meta.theory||'enfoque inductivo'}) confirmando algunos de sus postulados y matizando otros desde la evidencia empírica del corpus.</p>
-    <h3>Conclusiones</h3>
-    <p>El estudio permite concluir que el fenómeno analizado es complejo, situado y multifactorial. Las interpretaciones aquí presentadas constituyen una lectura fundamentada en los datos, susceptible de profundización mediante estudios longitudinales o con mayor número de participantes.</p>
-    <h3>Aportes de la investigación</h3>
-    <p>Esta investigación aporta: (a) una descripción densa del fenómeno desde la perspectiva de los actores; (b) un sistema de codificación y categorización reproducible; (c) evidencia empírica que enriquece el debate teórico en el campo de estudio; (d) recomendaciones para futuras investigaciones y para la toma de decisiones en el contexto analizado.</p>`;
-}
-
-function escHtml(t) {
-  return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ─── EXPORT ───────────────────────────────────────────────
-function exportHTML() {
-  const content = document.getElementById('phasesContainer').innerHTML;
-  const q = document.getElementById('fQuestion').value;
-  const blob = new Blob([`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Análisis Cualitativo</title><style>body{font-family:Georgia,serif;max-width:820px;margin:40px auto;padding:0 20px;color:#1a1a1a;line-height:1.8}h1{color:#1B2C4E;border-bottom:3px solid #2D8653;padding-bottom:10px}h3{color:#6B7A8F;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-top:20px;border-top:1px solid #eee;padding-top:14px}blockquote{border-left:3px solid #2D8653;padding:10px 16px;background:#EAF5EF;margin:14px 0;font-style:italic}.phase-card-hdr{background:#1B2C4E;color:#fff;padding:14px 20px;border-radius:8px 8px 0 0;margin-top:28px;display:flex;align-items:center;gap:10px}.phase-card-num{background:rgba(255,255,255,0.15);border-radius:50%;width:26px;height:26px;text-align:center;line-height:26px;font-size:12px;font-weight:700}.phase-card-body{border:1px solid #e2e0db;border-top:none;padding:22px;border-radius:0 0 8px 8px}.code-chip{background:#FDF3E3;color:#C07A1A;padding:2px 8px;border-radius:4px;font-size:12px;font-family:monospace;font-weight:600;margin:2px;border:1px solid rgba(192,122,26,0.2)}.cat-tag{background:#EAF5EF;color:#2D8653;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;margin:3px}</style></head><body><h1>Informe de Análisis Cualitativo</h1><p><strong>Pregunta:</strong> ${q}</p><p><strong>Generado:</strong> ${new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'})}</p>${content}</body></html>`], {type:'text/html'});
-  dlBlob(blob,'analisis-cualitativo.html');
-}
-
-function exportTXT() {
-  const cards = document.querySelectorAll('.phase-card');
-  let txt = `INFORME DE ANÁLISIS CUALITATIVO\n${'='.repeat(60)}\n`;
-  txt += `Pregunta: ${document.getElementById('fQuestion').value}\n`;
-  txt += `Fecha: ${new Date().toLocaleDateString('es-CO')}\n\n`;
-  cards.forEach(card => {
-    const title = card.querySelector('.phase-card-title')?.textContent||'';
-    const body = card.querySelector('.phase-card-body')?.innerText||'';
-    txt += `\n${'─'.repeat(60)}\n${title.toUpperCase()}\n${'─'.repeat(60)}\n${body}\n`;
+// ── Descriptives ──
+function computeDescriptives(cols){
+  return cols.map(col=>{
+    const arr=getCol(col);
+    const s=[...arr].sort((a,b)=>a-b);
+    const q1=s[Math.floor(s.length*.25)],q3=s[Math.floor(s.length*.75)];
+    const mo=mode(arr);
+    return{col,n:arr.length,mean:+mean(arr).toFixed(4),median:+median(arr).toFixed(4),
+      mode:mo?mo.join(', '):'Amodal',sd:+stdDev(arr).toFixed(4),
+      variance:+variance(arr).toFixed(4),min:Math.min(...arr),max:Math.max(...arr),
+      range:+(Math.max(...arr)-Math.min(...arr)).toFixed(4),
+      q1,q3,iqr:+(q3-q1).toFixed(4),cv:+(stdDev(arr)/mean(arr)*100).toFixed(2),
+      skew:+skewness(arr).toFixed(4),kurt:+kurtosis(arr).toFixed(4)};
   });
-  dlBlob(new Blob([txt],{type:'text/plain'}),'analisis-cualitativo.txt');
 }
 
-function dlBlob(blob, name) {
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+function renderDescriptives(desc, cols){
+  const html = desc.map(d=>`
+    <h4>${d.col}</h4>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="sc-label">Media (x̄)</div><div class="sc-value">${d.mean}</div></div>
+      <div class="stat-card"><div class="sc-label">Mediana</div><div class="sc-value">${d.median}</div></div>
+      <div class="stat-card"><div class="sc-label">Desv. estándar</div><div class="sc-value">${d.sd}</div></div>
+      <div class="stat-card"><div class="sc-label">Moda</div><div class="sc-value" style="font-size:16px">${d.mode}</div></div>
+      <div class="stat-card"><div class="sc-label">Mín</div><div class="sc-value">${d.min}</div></div>
+      <div class="stat-card"><div class="sc-label">Máx</div><div class="sc-value">${d.max}</div></div>
+      <div class="stat-card"><div class="sc-label">Rango</div><div class="sc-value">${d.range}</div></div>
+      <div class="stat-card"><div class="sc-label">CV %</div><div class="sc-value">${d.cv}%</div></div>
+    </div>
+    <p>Q1: <span class="val-pill">${d.q1}</span> · Q3: <span class="val-pill">${d.q3}</span> · IQR: <span class="val-pill">${d.iqr}</span> · 
+    Varianza: <span class="val-pill">${d.variance}</span> · Asimetría: <span class="val-pill">${d.skew}</span> · Curtosis: <span class="val-pill">${d.kurt}</span></p>
+    <div class="interpret">${interpretDesc(d)}</div>`).join('');
+  return `<div class="chart-wrap"><div class="chart-title">Comparación de medias</div><canvas id="chartMeans" style="max-height:220px"></canvas></div>${html}`;
 }
 
-function resetAll() {
-  uploadedFiles=[]; parsedData=[]; analysisResult={};
+function interpretDesc(d){
+  let t=`<strong>${d.col}:</strong> La distribución presenta una media de ${d.mean} con desviación estándar de ${d.sd}`;
+  t+=`. El coeficiente de variación de ${d.cv}% indica ${d.cv<15?'alta homogeneidad':d.cv<30?'variabilidad moderada':'alta dispersión'} en los datos.`;
+  if(Math.abs(d.skew)>1) t+=` La asimetría (${d.skew}) señala una distribución ${d.skew>0?'sesgada positivamente (cola derecha)':'sesgada negativamente (cola izquierda)'}.`;
+  else t+=` La asimetría (${d.skew}) es ${Math.abs(d.skew)<0.5?'casi nula, sugiriendo simetría':'leve'}.`;
+  return t;
+}
+
+// ── Distribution ──
+function computeDistribution(cols){
+  return cols.map(col=>{
+    const arr=getCol(col);
+    const sw=shapiroApprox(arr);
+    const bins=makeBins(arr,6);
+    return{col,sw,bins,n:arr.length};
+  });
+}
+
+function makeBins(arr,k){
+  const mn=Math.min(...arr),mx=Math.max(...arr),w=(mx-mn)/k;
+  const bins=[];
+  for(let i=0;i<k;i++){
+    const lo=mn+i*w,hi=lo+w;
+    bins.push({label:`${lo.toFixed(1)}–${hi.toFixed(1)}`,count:arr.filter(v=>v>=lo&&(i===k-1?v<=hi:v<hi)).length});
+  }
+  return bins;
+}
+
+function renderDistribution(dist, cols){
+  const alpha = parseFloat(document.getElementById('alphaLevel')?.value||'0.05');
+  const swRows=dist.map(d=>{
+    const sig=d.sw.p<alpha;
+    return`<tr><td>${d.col}</td><td class="num">${d.sw.W}</td><td class="num">${d.sw.p}</td>
+      <td><span class="sig ${sig?'no':'yes'}">${sig?'No normal (p<α)':'Normal (p≥α)'}</span></td>
+      <td>${sig?'Prueba no paramétrica recomendada':'Prueba paramétrica válida'}</td></tr>`;}).join('');
+
+  return`<h4>Prueba de normalidad (Shapiro-Wilk aproximado)</h4>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Variable</th><th>W</th><th>p-valor</th><th>Resultado</th><th>Implicación</th></tr></thead>
+      <tbody>${swRows}</tbody></table></div>
+    <div class="chart-wrap"><div class="chart-title">Histograma — ${cols[0]}</div><canvas id="chartHist" style="max-height:220px"></canvas></div>
+    <div class="interpret">La normalidad de los datos es un supuesto clave para pruebas paramétricas (t, ANOVA). Cuando p &lt; α (${alpha}) la distribución se desvía significativamente de la normal y deben preferirse alternativas no paramétricas.</div>`;
+}
+
+// ── Correlations ──
+function computeCorrelations(cols){
+  const matrix={};
+  cols.forEach(c1=>{ matrix[c1]={}; cols.forEach(c2=>{ const a=getCol(c1),b=getCol(c2); matrix[c1][c2]=+pearson(a,b).toFixed(3); }); });
+  return matrix;
+}
+
+function renderCorrelations(corr, cols){
+  const hdr=`<tr><th></th>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  const rows=cols.map(c1=>`<tr><th style="text-align:left;padding-left:12px">${c1}</th>${cols.map(c2=>{
+    const r=corr[c1][c2];
+    const cls=c1===c2?'diag':r>0.3?'cpos':r<-0.3?'cneg':'cneu';
+    return`<td class="${cls}">${r}</td>`;}).join('')}</tr>`).join('');
+  const notable=[];
+  cols.forEach((c1,i)=>cols.forEach((c2,j)=>{ if(j>i){ const r=corr[c1][c2]; if(Math.abs(r)>=0.5) notable.push({c1,c2,r}); } }));
+
+  return`<h4>Matriz de correlaciones de Pearson (r)</h4>
+    <div class="corr-wrap"><table class="corr-table"><thead>${hdr}</thead><tbody>${rows}</tbody></table></div>
+    <p style="font-size:11px;color:var(--text3)">Verde = correlación positiva moderada-fuerte (r≥0.3) · Rojo = correlación negativa · Gris = baja/nula · Diagonal = autocorrelación (r=1)</p>
+    <div class="chart-wrap"><div class="chart-title">Correlaciones notables (|r| ≥ 0.5)</div><canvas id="chartCorr" style="max-height:200px"></canvas></div>
+    ${notable.length?`<h4>Pares con correlación notable</h4><ul>${notable.map(n=>`<li><strong>${n.c1}</strong> × <strong>${n.c2}</strong>: r = <span class="val-pill">${n.r}</span> — correlación ${interpretCorr(n.r)}</li>`).join('')}</ul>`:'<p>No se encontraron pares con |r| ≥ 0.5.</p>'}
+    <div class="interpret">Nota: la correlación de Pearson mide la asociación lineal. No implica causalidad. Para variables con distribución no normal se recomienda usar Spearman (rs).</div>`;
+}
+
+function interpretCorr(r){
+  const a=Math.abs(r), s=r>0?'positiva':'negativa';
+  if(a>=0.9) return s+' muy fuerte';
+  if(a>=0.7) return s+' fuerte';
+  if(a>=0.5) return s+' moderada';
+  if(a>=0.3) return s+' débil';
+  return s+' muy débil';
+}
+
+// ── Inferential ──
+function computeInferential(cols, groupVar, alpha){
+  const result={tests:[],groupStat:null};
+  if(groupVar){
+    const groups=[...new Set(rawData.map(r=>r[groupVar]))].filter(g=>g!=='');
+    if(groups.length===2){
+      cols.forEach(col=>{
+        const a=rawData.filter(r=>r[groupVar]===groups[0]).map(r=>num(r[col])).filter(v=>!isNaN(v));
+        const b=rawData.filter(r=>r[groupVar]===groups[1]).map(r=>num(r[col])).filter(v=>!isNaN(v));
+        if(a.length>=3&&b.length>=3){
+          const tt=tTest(a,b);
+          result.tests.push({type:'t',col,groups,g1:{n:a.length,mean:+mean(a).toFixed(3),sd:+stdDev(a).toFixed(3)},
+            g2:{n:b.length,mean:+mean(b).toFixed(3),sd:+stdDev(b).toFixed(3)},...tt,alpha,sig:tt.p<alpha});
+        }
+      });
+    }
+    if(groups.length>=3){
+      cols.forEach(col=>{
+        const gData=groups.map(g=>rawData.filter(r=>r[groupVar]===g).map(r=>num(r[col])).filter(v=>!isNaN(v)));
+        const valid=gData.filter(g=>g.length>=2);
+        if(valid.length>=2){
+          const allMean=mean(valid.flat());
+          const SSb=valid.reduce((s,g)=>s+g.length*(mean(g)-allMean)**2,0);
+          const SSw=valid.reduce((s,g)=>s+g.reduce((ss,v)=>ss+(v-mean(g))**2,0),0);
+          const dfb=valid.length-1,dfw=valid.flat().length-valid.length;
+          const F=(SSb/dfb)/(SSw/dfw);
+          const p=Math.max(0.001,1-fCDF(F,dfb,dfw));
+          result.tests.push({type:'anova',col,groups:groups.slice(0,valid.length),F:+F.toFixed(3),dfb,dfw,p:+p.toFixed(3),sig:p<alpha,alpha});
+        }
+      });
+    }
+  }
+  if(result.tests.length===0&&cols.length>=2){
+    const a=getCol(cols[0]),b=getCol(cols.length>1?cols[1]:cols[0]);
+    if(a.length>=3&&b.length>=3){
+      const tt=tTest(a,b);
+      result.tests.push({type:'t',col:cols[0]+' vs '+cols[1],groups:[cols[0],cols[1]],
+        g1:{n:a.length,mean:+mean(a).toFixed(3),sd:+stdDev(a).toFixed(3)},
+        g2:{n:b.length,mean:+mean(b).toFixed(3),sd:+stdDev(b).toFixed(3)},...tt,alpha,sig:tt.p<alpha});
+    }
+  }
+  return result;
+}
+
+function fCDF(f,d1,d2){ return Math.min(1,1-1/(1+d1*f/d2)); }
+
+function renderInferential(inf, groupVar, alpha){
+  if(!inf.tests.length) return`<p>No se pudo ejecutar prueba inferencial. Verifica que tengas columnas numéricas y, si deseas comparar grupos, selecciona la variable de agrupación.</p>`;
+  return inf.tests.map(t=>{
+    if(t.type==='t') return`
+      <h4>Prueba t de Student — ${t.col}</h4>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="sc-label">${t.groups[0]} — Media</div><div class="sc-value">${t.g1.mean}</div><div class="sc-unit">n = ${t.g1.n} · SD = ${t.g1.sd}</div></div>
+        <div class="stat-card"><div class="sc-label">${t.groups[1]} — Media</div><div class="sc-value">${t.g2.mean}</div><div class="sc-unit">n = ${t.g2.n} · SD = ${t.g2.sd}</div></div>
+        <div class="stat-card"><div class="sc-label">t</div><div class="sc-value">${t.t}</div><div class="sc-unit">gl = ${t.df}</div></div>
+        <div class="stat-card"><div class="sc-label">p-valor</div><div class="sc-value">${t.p}</div></div>
+        <div class="stat-card"><div class="sc-label">Cohen's d</div><div class="sc-value">${t.d}</div><div class="sc-unit">${t.d<0.2?'mínimo':t.d<0.5?'pequeño':t.d<0.8?'mediano':'grande'}</div></div>
+        <div class="stat-card"><div class="sc-label">Decisión (α=${alpha})</div><div class="sc-value" style="font-size:16px"><span class="sig ${t.sig?'yes':'no'}">${t.sig?'H₁ ✓':'H₀ ✗'}</span></div></div>
+      </div>
+      <div class="interpret">${t.sig?`Con p = ${t.p} < α = ${alpha}, se rechaza la hipótesis nula. Existe diferencia estadísticamente significativa entre ${t.groups[0]} (x̄=${t.g1.mean}) y ${t.groups[1]} (x̄=${t.g2.mean}). El tamaño del efecto (d=${t.d}) es ${t.d<0.2?'mínimo':t.d<0.5?'pequeño':t.d<0.8?'mediano':'grande'}.`:`Con p = ${t.p} ≥ α = ${alpha}, no se rechaza la hipótesis nula. No hay evidencia suficiente de diferencia significativa entre grupos.`}</div>`;
+    if(t.type==='anova') return`
+      <h4>ANOVA de un factor — ${t.col}</h4>
+      <p>Grupos: ${t.groups.join(', ')} · F(${t.dfb}, ${t.dfw}) = <span class="val-pill">${t.F}</span> · p = <span class="val-pill">${t.p}</span> · α = ${t.alpha}</p>
+      <div class="interpret">${t.sig?`F = ${t.F} con p = ${t.p} < α = ${t.alpha}. Hay diferencia significativa entre al menos dos grupos. Se recomienda aplicar prueba post-hoc (Tukey HSD o Bonferroni) para identificar los pares específicos.`:`F = ${t.F} con p = ${t.p} ≥ α = ${t.alpha}. No hay diferencia estadísticamente significativa entre los grupos.`}</div>`;
+    return'';
+  }).join('');
+}
+
+// ── Likert ──
+function computeLikert(cols, scale){
+  const alpha_c = cronbachAlpha(cols);
+  const itemStats = cols.map(col=>{
+    const arr=getCol(col);
+    const freq=Array.from({length:scale},(_,i)=>arr.filter(x=>x===i+1).length);
+    return{col,mean:+mean(arr).toFixed(3),sd:+stdDev(arr).toFixed(3),freq};
+  });
+  const totalScores = rawData.map(r=>cols.reduce((s,c)=>{const v=parseFloat(r[c]);return s+(isNaN(v)?0:v);},0));
+  const maxTotal = scale * cols.length;
+  const index = +(mean(totalScores)/maxTotal*100).toFixed(1);
+  return{alpha_c,itemStats,totalScores,index,maxTotal,scale};
+}
+
+function renderLikert(lik, cols, scale){
+  const interp = lik.alpha_c>=0.9?'excelente':lik.alpha_c>=0.8?'buena':lik.alpha_c>=0.7?'aceptable':lik.alpha_c>=0.6?'cuestionable':'inaceptable';
+  const colors=['#C13030','#B86E00','#6B7A90','#1A8C7A','#1F7A4A'];
+  const labels=['Muy en desacuerdo','En desacuerdo','Neutro','De acuerdo','Muy de acuerdo'].slice(0,scale);
+
+  const bars = lik.itemStats.map(it=>{
+    const total=it.freq.reduce((a,b)=>a+b,0)||1;
+    const segs=it.freq.map((f,i)=>`<div class="lb-seg" style="width:${(f/total*100).toFixed(1)}%;background:${colors[i]||'#999'}">${f>0&&f/total>0.08?Math.round(f/total*100)+'%':''}</div>`).join('');
+    return`<div class="likert-bar"><div class="lb-label">${it.col} — x̄ = ${it.mean} (SD = ${it.sd})</div><div class="lb-track">${segs}</div></div>`;
+  }).join('');
+
+  return`<h4>Fiabilidad del instrumento</h4>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="sc-label">Alfa de Cronbach</div><div class="sc-value">${lik.alpha_c??'—'}</div><div class="sc-unit">Consistencia ${interp}</div></div>
+      <div class="stat-card"><div class="sc-label">Ítems analizados</div><div class="sc-value">${cols.length}</div></div>
+      <div class="stat-card"><div class="sc-label">Índice general</div><div class="sc-value">${lik.index}%</div><div class="sc-unit">del máximo posible</div></div>
+      <div class="stat-card"><div class="sc-label">n respondentes</div><div class="sc-value">${lik.totalScores.length}</div></div>
+    </div>
+    <div class="interpret">Alfa de Cronbach = ${lik.alpha_c} → consistencia interna ${interp}. ${lik.alpha_c>=0.7?'El instrumento es confiable para uso en investigación.':'Se recomienda revisar y depurar ítems para mejorar la consistencia.'}</div>
+    <h4>Distribución de respuestas por ítem</h4>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      ${colors.slice(0,scale).map((c,i)=>`<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:2px;background:${c}"></div><span style="font-size:11px;color:var(--text3)">${i+1}. ${labels[i]||i+1}</span></div>`).join('')}
+    </div>
+    ${bars}`;
+}
+
+// ── Regression ──
+function computeRegression(cols){
+  if(cols.length<2) return null;
+  const x=getCol(cols[0]),y=getCol(cols[1]);
+  const reg=linearRegression(x,y);
+  return{...reg,xCol:cols[0],yCol:cols[1],n:Math.min(x.length,y.length)};
+}
+
+function renderRegression(reg, cols){
+  if(!reg) return'<p>Se requieren al menos dos variables numéricas.</p>';
+  return`<h4>Regresión lineal simple: ${reg.xCol} → ${reg.yCol}</h4>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="sc-label">β₀ (intercepto)</div><div class="sc-value">${reg.b0}</div></div>
+      <div class="stat-card"><div class="sc-label">β₁ (pendiente)</div><div class="sc-value">${reg.b1}</div></div>
+      <div class="stat-card"><div class="sc-label">r de Pearson</div><div class="sc-value">${reg.r}</div></div>
+      <div class="stat-card"><div class="sc-label">R² (det.)</div><div class="sc-value">${reg.r2}</div><div class="sc-unit">${(reg.r2*100).toFixed(1)}% de varianza explicada</div></div>
+      <div class="stat-card"><div class="sc-label">Error estándar</div><div class="sc-value">${reg.se}</div></div>
+      <div class="stat-card"><div class="sc-label">n</div><div class="sc-value">${reg.n}</div></div>
+    </div>
+    <div class="chart-wrap"><div class="chart-title">Dispersión: ${reg.xCol} vs ${reg.yCol}</div><canvas id="chartScatter" style="max-height:240px"></canvas></div>
+    <p>Ecuación del modelo: <span class="val-pill">ŷ = ${reg.b0} + ${reg.b1}·x</span></p>
+    <div class="interpret">${interpretReg(reg)}</div>`;
+}
+
+function interpretReg(reg){
+  const r2pct=(reg.r2*100).toFixed(1);
+  let t=`El modelo de regresión lineal explica el ${r2pct}% de la varianza de <strong>${reg.yCol}</strong> a partir de <strong>${reg.xCol}</strong> (R² = ${reg.r2}).`;
+  t+=` La correlación de Pearson es ${interpretCorr(reg.r)} (r = ${reg.r}).`;
+  t+=` Por cada unidad que aumenta ${reg.xCol}, ${reg.yCol} ${reg.b1>0?'aumenta':'disminuye'} en ${Math.abs(reg.b1)} unidades.`;
+  if(reg.r2<0.3) t+=' El R² bajo sugiere que la relación lineal es débil; considera variables adicionales.';
+  return t;
+}
+
+// ── Conclusions ──
+function renderConclusions(desc, corr, inf, lik, title, alpha){
+  const n = rawData.length;
+  const numCols = selectedCols.filter(c=>numericCols.includes(c));
+  let html=`<h4>Resumen del análisis</h4>
+    <p>El estudio "<strong>${title}</strong>" procesó <strong>${n}</strong> casos con <strong>${numCols.length}</strong> variable(s) numérica(s). A continuación se sintetizan los principales hallazgos estadísticos:</p><ul>`;
+
+  desc.forEach(d=>{ html+=`<li><strong>${d.col}</strong>: x̄ = ${d.mean}, SD = ${d.sd}, CV = ${d.cv}% (${d.cv<15?'alta homogeneidad':d.cv<30?'variabilidad moderada':'alta dispersión'}).</li>`; });
+  if(lik) html+=`<li>Fiabilidad del instrumento: α de Cronbach = ${lik.alpha_c} (consistencia ${lik.alpha_c>=0.8?'buena-excelente':'aceptable o inferior'}) · Índice general: ${lik.index}%.</li>`;
+  if(inf&&inf.tests.length) inf.tests.forEach(t=>{
+    if(t.type==='t') html+=`<li>Prueba t para <strong>${t.col}</strong>: t = ${t.t}, p = ${t.p} — diferencia ${t.sig?'<strong>significativa</strong>':'no significativa'} (α = ${alpha}).</li>`;
+    if(t.type==='anova') html+=`<li>ANOVA para <strong>${t.col}</strong>: F = ${t.F}, p = ${t.p} — ${t.sig?'<strong>diferencia significativa entre grupos</strong>':'sin diferencia significativa'}.</li>`;
+  });
+  html+='</ul>';
+  html+=`<h4>Recomendaciones metodológicas</h4><ul>`;
+  const anyNonNormal = numCols.some(c=>{const sw=shapiroApprox(getCol(c));return sw.p<alpha;});
+  if(anyNonNormal) html+=`<li>Una o más variables no siguen distribución normal (Shapiro-Wilk p &lt; ${alpha}). Considera pruebas no paramétricas (Mann-Whitney, Kruskal-Wallis, Spearman) como complemento o alternativa.</li>`;
+  if(n<30) html+=`<li>El tamaño muestral (n = ${n}) es pequeño. Interpreta los resultados con cautela y considera ampliar la muestra para mayor potencia estadística.</li>`;
+  if(lik&&lik.alpha_c<0.7) html+=`<li>El alfa de Cronbach (${lik.alpha_c}) está por debajo del umbral aceptable (0.7). Revisa los ítems con menor correlación ítem-total y considera eliminarlos.</li>`;
+  html+=`<li>Reporta siempre el tamaño del efecto (d de Cohen, R², η²) además del p-valor para una interpretación completa.</li>`;
+  html+=`<li>Los análisis aquí presentados son de carácter cuantitativo. Para conclusiones causales se requiere diseño experimental con aleatorización.</li></ul>`;
+  html+=`<div class="interpret">Este informe fue generado automáticamente por AnalisisCuant. Las pruebas inferenciales utilizan aproximaciones numéricas de las distribuciones (t, F, Shapiro-Wilk), por lo que los p-valores son orientativos; para publicación se recomienda confirmar con software estadístico (R, SPSS, jamovi). Los resultados deben ser revisados e interpretados por el investigador en el contexto de su marco teórico y diseño metodológico específico.</div>`;
+  return html;
+}
+
+// ── Chart building ──
+function buildCharts(desc, dist, corr, cols){
+  if(document.getElementById('chartMeans')&&desc.length){
+    makeChart('chartMeans','bar',
+      desc.map(d=>d.col),
+      [{label:'Media',data:desc.map(d=>d.mean)},
+       {label:'Mediana',data:desc.map(d=>d.median),borderDash:[5,5],type:'line',fill:false}],
+      {plugins:{legend:{position:'bottom'}}});
+  }
+  if(document.getElementById('chartHist')&&dist.length){
+    const d=dist[0];
+    makeChart('chartHist','bar',d.bins.map(b=>b.label),[{label:'Frecuencia',data:d.bins.map(b=>b.count)}],
+      {plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}});
+  }
+  if(document.getElementById('chartCorr')&&corr&&cols.length>=2){
+    const pairs=[],vals=[];
+    cols.forEach((c1,i)=>cols.forEach((c2,j)=>{if(j>i){pairs.push(c1+' × '+c2);vals.push(corr[c1][c2]);}}));
+    if(pairs.length) makeChart('chartCorr','bar',pairs,[{label:'r de Pearson',data:vals}],
+      {plugins:{legend:{display:false}},scales:{y:{min:-1,max:1}}});
+  }
+  if(document.getElementById('chartScatter')&&cols.length>=2){
+    const x=getCol(cols[0]),y=getCol(cols[1]),n=Math.min(x.length,y.length);
+    const reg=linearRegression(x,y);
+    const pts=Array.from({length:n},(_,i)=>({x:x[i],y:y[i]}));
+    const mn=Math.min(...x),mx=Math.max(...x);
+    const line=[{x:mn,y:reg.b0+reg.b1*mn},{x:mx,y:reg.b0+reg.b1*mx}];
+    const ctx=document.getElementById('chartScatter').getContext('2d');
+    const c=new Chart(ctx,{type:'scatter',data:{datasets:[
+      {label:'Datos',data:pts,backgroundColor:'#1A8C7A44',borderColor:'#1A8C7A',borderWidth:1,pointRadius:4},
+      {label:'Regresión',data:line,type:'line',fill:false,borderColor:'#C13030',borderDash:[6,3],pointRadius:0,borderWidth:2}
+    ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:11}}}},scales:{x:{title:{display:true,text:cols[0]}},y:{title:{display:true,text:cols[1]}}}}});
+    charts.push(c);
+  }
+}
+
+// ══ EXPORT ══
+const TRANSLATIONS = {
+  'Estadística descriptiva':'Descriptive Statistics','Media (x̄)':'Mean (x̄)','Mediana':'Median','Desv. estándar':'Std. Deviation','Moda':'Mode','Rango':'Range','Varianza':'Variance','Asimetría':'Skewness','Curtosis':'Kurtosis',
+  'Distribución y normalidad':'Distribution and Normality','Prueba de normalidad':'Normality Test','Variable':'Variable','Resultado':'Result','Implicación':'Implication','Normal':'Normal','No normal':'Non-normal',
+  'Matriz de correlaciones':'Correlation Matrix','Pruebas inferenciales':'Inferential Tests','Prueba t de Student':'Student t-Test','Media':'Mean','Decisión':'Decision','Diferencia':'Difference','Hay diferencia':'There is a difference','No hay diferencia':'No significant difference',
+  'Análisis de escala Likert':'Likert Scale Analysis','Fiabilidad del instrumento':'Instrument Reliability','Alfa de Cronbach':'Cronbach Alpha','Ítems analizados':'Items analyzed','Índice general':'General index','n respondentes':'n respondents',
+  'Regresión lineal simple':'Simple Linear Regression','Síntesis y conclusiones':'Summary and Conclusions',
+  'Informe de análisis cuantitativo':'Quantitative Analysis Report','Generado':'Generated'
+};
+
+function tr(txt, lang){ if(lang==='en') { let t=txt; Object.entries(TRANSLATIONS).forEach(([es,en])=>{t=t.replace(new RegExp(es,'gi'),en);}); return t; } return txt; }
+
+function exportHTML(lang='es') {
+  const title = document.getElementById('resTitle').textContent;
+  const content = document.getElementById('resultsContainer').innerHTML;
+  const date = new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+  const css=`body{font-family:'Inter',sans-serif;max-width:900px;margin:40px auto;padding:0 24px;color:#18202E;line-height:1.7}
+    h1{color:#0F2040;border-bottom:3px solid #1A8C7A;padding-bottom:10px;margin-bottom:4px}
+    h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#5A6A7E;margin:18px 0 8px;border-top:1px solid #DDE1E8;padding-top:12px}
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+    .stat-card{background:#F4F6FA;border-radius:8px;padding:12px 14px}
+    .sc-label{font-size:10px;text-transform:uppercase;color:#6B7A90;margin-bottom:3px}
+    .sc-value{font-size:20px;font-weight:600;color:#0F2040}.sc-unit{font-size:11px;color:#8899AA}
+    .rc-head{background:#0F2040;color:#fff;padding:12px 18px;border-radius:8px 8px 0 0;margin-top:24px;display:flex;align-items:center;gap:10px}
+    .rc-badge{background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+    .rc-title{font-size:13px;font-weight:600}.rc-toggle{display:none}
+    .rc-body{border:1px solid #DDE1E8;border-top:none;padding:20px;border-radius:0 0 8px 8px}
+    .interpret{background:#E6F5F2;border-left:3px solid #1A8C7A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;margin:12px 0}
+    .val-pill{background:#EEF1FB;color:#3D52B0;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:12px}
+    .sig.yes{background:#E8F5EE;color:#1F7A4A;padding:2px 8px;border-radius:4px;font-size:12px}
+    .sig.no{background:#FEF3E2;color:#B86E00;padding:2px 8px;border-radius:4px;font-size:12px}
+    .corr-table{border-collapse:collapse;font-size:11px}.corr-table th,.corr-table td{padding:5px 9px;border:1px solid #DDE1E8;text-align:center}
+    .corr-table th{background:#0F2040;color:#fff}.cpos{background:#E6F5F2;color:#0B5E50}.cneg{background:#FEF0F0;color:#8B1E1E}
+    .data-table{width:100%;border-collapse:collapse;font-size:12px}.data-table th{background:#0F2040;color:#fff;padding:7px 10px}.data-table td{padding:5px 10px;border-bottom:1px solid #DDE1E8}
+    .likert-bar{margin-bottom:10px}.lb-label{font-size:12px;margin-bottom:3px;font-weight:500}
+    .lb-track{height:16px;background:#F4F6FA;border-radius:3px;overflow:hidden;display:flex}
+    .lb-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600}
+    canvas{max-width:100%!important;max-height:260px!important}`;
+  const bodyContent = lang==='en' ? tr(content,lang) : content;
+  const blob=new Blob([`<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"><title>${tr(title,lang)}</title><style>${css}</style></head><body><h1>${tr(title,lang)}</h1><p style="font-size:12px;color:#6B7A90">${lang==='en'?'Generated':'Generado'}: ${date} · AnalisisCuant</p>${bodyContent}</body></html>`],{type:'text/html'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`informe-cuantitativo-${lang}.html`; a.click();
+}
+
+function exportTXT(){
+  const cards=document.querySelectorAll('.res-card');
+  let txt=`INFORME DE ANÁLISIS CUANTITATIVO\n${'='.repeat(60)}\n`;
+  txt+=`${document.getElementById('resTitle').textContent}\n`;
+  txt+=`Fecha: ${new Date().toLocaleDateString('es-CO')}\n\n`;
+  cards.forEach(card=>{
+    const title=card.querySelector('.rc-title')?.textContent||'';
+    const body=card.querySelector('.rc-body')?.innerText||'';
+    txt+=`\n${'─'.repeat(60)}\n${title.toUpperCase()}\n${'─'.repeat(60)}\n${body}\n`;
+  });
+  const blob=new Blob([txt],{type:'text/plain'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='informe-cuantitativo.txt'; a.click();
+}
+
+function resetAll(){
+  rawData=[]; headers=[]; numericCols=[]; selectedCols=[]; destroyCharts();
   document.getElementById('filesList').innerHTML='';
-  document.getElementById('phasesContainer').innerHTML='';
+  document.getElementById('previewSection').style.display='none';
   document.getElementById('resultsArea').style.display='none';
   document.getElementById('emptyState').style.display='flex';
   document.getElementById('btnNext1').disabled=true;
-  document.getElementById('validationBox').classList.remove('show');
-  ['fQuestion','fObjectives','fTheory','fMethod','fParticipants','fContext'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('pasteArea').value='';
+  document.getElementById('colSelector').innerHTML='';
+  document.getElementById('sidebarSections').style.display='none';
+  ['sb-likert-btn','sb-fact-btn'].forEach(id=>document.getElementById(id).style.display='none');
   goStep(0);
 }
 
-// ─── INIT ─────────────────────────────────────────────────
+// ══ INIT ══
 renderPreview();
 </script>
 </body>
