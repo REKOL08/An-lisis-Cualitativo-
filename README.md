@@ -1,182 +1,116 @@
-# AnálisisCual
+# AnalisisCuant
 
-**Herramienta de análisis cualitativo estructurado para investigadores.**  
-Sin API. Sin servidor. Sin costo. Todo ocurre en tu navegador.
+Herramienta web de **análisis estadístico cuantitativo** que funciona 100 % en el navegador, sin servidor ni instalación. Pensada para investigación académica (artículos, tesis, ALFIN) y para reportes de gestión institucional.
 
-🔗 **Demo:** [`https://rekol08.github.io/An-lisis-Cualitativo-/`]
-
----
-
-## ¿Qué hace?
-
-AnálisisCual toma tus datos cualitativos en texto plano (entrevistas, notas de campo, documentos, corpus mixtos) y genera un **informe estructurado en 8 fases metodológicas**, siguiendo los estándares de la investigación cualitativa rigurosa:
-
-| Fase | Descripción |
-|------|-------------|
-| 1 | Organización e inventario del corpus |
-| 2 | Codificación de datos con frecuencia |
-| 3 | Categorización y construcción de subcategorías |
-| 4 | Interpretación de hallazgos |
-| 5 | Relación con el marco teórico |
-| 6 | Uso de evidencias y citas textuales |
-| 7 | Evaluación del rigor científico (credibilidad, transferibilidad, dependabilidad, confirmabilidad) |
-| 8 | Presentación de resultados y conclusiones |
+Un solo archivo HTML: `AnalisisCuant.html`. Lo abres con doble clic y ya está.
 
 ---
 
-## Inicio rápido
+## Características
 
-### 1. Clonar o descargar
-
-```bash
-git clone https://github.com/[tu-usuario]/[nombre-del-repo].git
-```
-
-O descarga el archivo `index.html` directamente y ábrelo en tu navegador.
-
-### 2. Publicar en GitHub Pages
-
-1. Sube `index.html` a la raíz de tu repositorio
-2. Ve a **Settings → Pages**
-3. En *Source*, selecciona `Deploy from a branch`
-4. Selecciona la rama `main` y la carpeta `/ (root)`
-5. Haz clic en **Save**
-
-La herramienta quedará disponible en:
-```
-https://[tu-usuario].github.io/[nombre-del-repo]
-```
+- **Dos modos de trabajo:**
+  - 🔬 **Investigación** — estadística descriptiva e inferencial completa para estudios formales.
+  - 📊 **Datos generales** — resúmenes y descriptivos para informes institucionales o de gestión.
+- **8 plantillas CSV descargables** según el tipo de datos (Likert, comparación de grupos, variables continuas, categóricas, indicadores, series, frecuencias, tabla cruzada).
+- **Carga flexible:** subir archivo CSV/TXT, arrastrar y soltar, o pegar los datos directamente.
+- **Detección automática** de columnas numéricas y de la variable de agrupación.
+- **Informe por secciones plegables** con tarjetas de estadísticos, tablas, interpretaciones en lenguaje natural y gráficas (Chart.js).
+- **Exportación** a HTML (español e inglés), TXT e impresión/PDF.
+- **Privacidad total:** los datos nunca salen del navegador.
 
 ---
 
-## Cómo usar la herramienta
+## Cómo usarlo
 
-### Paso 1 — Elige la plantilla adecuada
+El flujo tiene 4 pasos, visibles en la barra superior:
 
-La herramienta ofrece 4 tipos de plantilla según tu fuente de datos:
-
-| Tipo | Cuándo usarlo |
-|------|---------------|
-| **Entrevista / Transcripción** | Diálogos con participantes, grupos focales, historias de vida |
-| **Notas de campo / Observación** | Etnografía, observación participante, diarios de campo |
-| **Análisis documental** | Políticas, actas, informes, archivos institucionales |
-| **Múltiples fuentes / Mixto** | Combinación de entrevistas + observación + documentos |
-
-Descarga la plantilla, llénala con tus datos y guárdala como `.txt` o `.md`.
-
-### Paso 2 — Estructura tu archivo según la plantilla
-
-Cada tipo de plantilla tiene una estructura específica. El campo más importante es el **identificador de participante**, que permite al sistema extraer actores y citas:
-
-```
-P1: Cuando me dijeron que debía incorporar IA en mis clases, lo primero que sentí fue pánico.
-E:  ¿Y cómo resolvió esa situación?
-P1: Me apoyé en colegas más jóvenes. Fue un aprendizaje entre pares.
-```
-
-Los identificadores válidos son: `P1:`, `P2:`, `E:` (entrevistador), `A1:`, `A2:` (actores en observación), `DOCENTE:`, etc.  
-Para documentos, usa `[CITA]` antes de los fragmentos textuales clave.
-
-### Paso 3 — Carga el archivo y define el contexto
-
-- Arrastra uno o más archivos `.txt` / `.md` a la zona de carga
-- El sistema valida automáticamente que el archivo tenga la estructura correcta
-- Completa la pregunta de investigación, objetivos, marco teórico y metodología
-
-### Paso 4 — Ejecuta el análisis y exporta
-
-El análisis se ejecuta localmente en tu navegador. Al finalizar puedes:
-- Ver el informe completo por fases, expandibles y colapsables
-- Exportar en **HTML** (informe visual navegable)
-- Exportar en **TXT** (texto plano para edición)
-- **Imprimir** directamente con estilos limpios
+1. **Plantilla** — elige el modo y el tipo de datos. Descarga la plantilla CSV de ejemplo y reemplaza los datos con los tuyos.
+2. **Cargar datos** — sube o pega tu CSV. Verás una vista previa y las columnas detectadas como numéricas (NUM) o texto (TXT).
+3. **Configuración** — selecciona qué variables analizar, la variable de agrupación (para comparar grupos), el tipo de escala Likert, el nivel de significancia (α) y los metadatos del estudio. El título es obligatorio.
+4. **Análisis** — ejecuta y consulta el informe. Desde aquí exportas o empiezas uno nuevo.
 
 ---
 
-## Estructura del repositorio
+## Formato de los datos
+
+Reglas generales del archivo CSV:
+
+- La **primera fila** son los encabezados (nombres de las variables).
+- **Una fila por caso** (un participante, un registro, un periodo).
+- Para columnas numéricas, usa **punto** como separador decimal y no dejes celdas vacías.
+- Las **categorías de texto** deben escribirse exactamente igual en todas las filas (`Bogotá` ≠ `bogota`).
+- El separador puede ser coma, punto y coma o tabulación (se detecta solo).
+- Las líneas que empiezan con `#` se ignoran (sirven como comentarios o instrucciones).
+
+Ejemplo (plantilla Likert):
 
 ```
-/
-├── index.html       # Aplicación completa (una sola página)
-└── README.md        # Este archivo
+id,grupo,item1,item2,item3,item4
+1,A,4,5,3,4
+2,A,5,5,4,5
+3,B,3,3,4,3
 ```
 
-No se requieren dependencias, build tools, ni Node.js. Un solo archivo HTML es suficiente.
+Cada plantilla incluye sus propias reglas en pantalla y datos de ejemplo listos para reemplazar.
 
 ---
 
-## Requisitos técnicos
+## Análisis incluidos
 
-| Requisito | Detalle |
-|-----------|---------|
-| Navegador | Chrome 90+, Firefox 88+, Edge 90+, Safari 14+ |
-| Conexión a internet | Solo para cargar las fuentes tipográficas (Google Fonts). El análisis es 100% offline. |
-| API key | No se requiere ninguna |
-| Backend | No existe — todo es frontend puro |
+| Sección | Contenido |
+|---|---|
+| **E1 · Descriptiva** | Media, mediana, moda, desviación estándar, varianza, mínimo, máximo, rango, cuartiles, IQR, coeficiente de variación, asimetría y curtosis. |
+| **E2 · Distribución** | Histograma y prueba de normalidad (Shapiro-Wilk aproximado) con recomendación de prueba paramétrica vs. no paramétrica. |
+| **E3 · Correlaciones** | Matriz de Pearson con código de color y detección de pares con asociación notable (\|r\| ≥ 0.5). |
+| **E4 · Inferenciales** | Prueba t de Student (dos grupos) con tamaño del efecto (d de Cohen), y ANOVA de un factor (tres o más grupos). |
+| **E5 · Likert** | Alfa de Cronbach (fiabilidad), índice general del instrumento y distribución de respuestas por ítem. |
+| **E6 · Regresión** | Regresión lineal simple con β₀, β₁, r, R², error estándar y diagrama de dispersión con recta ajustada. |
+| **E7 · Conclusiones** | Síntesis de hallazgos y recomendaciones metodológicas automáticas. |
+
+---
+
+## ⚠️ Sobre los p-valores
+
+Las pruebas inferenciales (t, ANOVA, normalidad) usan **aproximaciones numéricas** de las distribuciones estadísticas, no las tablas exactas. Esto mantiene la app ligera y sin dependencias pesadas, pero significa que:
+
+- Los **p-valores son orientativos**, útiles para exploración y docencia.
+- Para resultados destinados a **publicación o evaluación formal**, confirma los valores con software estadístico estándar (R, SPSS, jamovi, JASP).
+
+La herramienta deja esta advertencia explícita en la sección de conclusiones de cada informe.
+
+---
+
+## Exportación
+
+Desde el panel de resultados:
+
+- **HTML (ES)** y **HTML (EN)** — informe autónomo con estilos incluidos. La versión EN traduce los títulos principales.
+- **TXT** — versión en texto plano para pegar en otros documentos.
+- **🖨** — imprime o guarda como PDF desde el diálogo del navegador.
 
 ---
 
 ## Privacidad
 
-> Tus datos nunca salen de tu navegador.
-
-El procesamiento ocurre completamente en el cliente. Ningún archivo, texto o resultado se envía a ningún servidor externo. La herramienta no usa cookies, no registra sesiones y no almacena información.
+Todo el procesamiento ocurre en tu navegador. No hay backend, no se sube nada a ningún servidor y no se guarda información entre sesiones. La única conexión externa es la carga de la librería de gráficas (Chart.js) y las fuentes, desde un CDN público.
 
 ---
 
-## Códigos de análisis incluidos
+## Requisitos técnicos
 
-El motor detecta automáticamente los siguientes patrones en el corpus:
-
-| Código | Dimensión |
-|--------|-----------|
-| `RESIST_CAMBIO` | Resistencia al cambio |
-| `APREND_AUTOPROPULSADO` | Aprendizaje autónomo |
-| `APOYO_INSTITUCIONAL` | Apoyo institucional |
-| `COMPET_DIGITAL` | Competencia digital |
-| `EXPERIENCIA_POSITIVA` | Experiencia positiva |
-| `BRECHA_GENERACIONAL` | Brecha generacional |
-| `IMPACTO_PEDAGÓGICO` | Impacto pedagógico |
-| `IDENTIDAD_PROFESIONAL` | Identidad y rol profesional |
-| `CONTEXTO_INSTITUCIONAL` | Contexto institucional |
-| `COMUNICACION_PARES` | Comunicación entre pares |
-| `TIEMPO_RECURSO` | Tiempo y recursos |
-| `EMOCIONES` | Emociones y afectos |
-
-Estos códigos están pensados para investigaciones en educación, ciencias sociales y humanidades. El sistema mide la frecuencia de cada código en el corpus y lo clasifica como `alta`, `media` o `baja`.
+- Cualquier navegador moderno (Chrome, Edge, Firefox, Safari).
+- Conexión a internet la primera vez, para cargar Chart.js y las fuentes desde el CDN. *(Si necesitas uso totalmente offline, se pueden incrustar esas librerías en el archivo.)*
+- Sin instalación, sin dependencias locales, sin cuenta.
 
 ---
 
-## Rigor científico evaluado
+## Limitaciones conocidas
 
-La herramienta evalúa automáticamente cuatro criterios de Lincoln y Guba (1985):
-
-- **Credibilidad:** ¿Los hallazgos reflejan adecuadamente la realidad estudiada?
-- **Transferibilidad:** ¿Es posible aplicar los resultados en contextos similares?
-- **Dependabilidad:** ¿El proceso investigativo es consistente y reproducible?
-- **Confirmabilidad:** ¿Los resultados se fundamentan en los datos y no en sesgos del investigador?
-
-Cada criterio recibe un nivel (`alto`, `medio`, `bajo`) con justificación basada en las características reales del corpus cargado.
+- En el menú de configuración aparecen **Mann-Whitney U** y **Chi-cuadrado** como opciones, pero el motor de cálculo todavía **no las ejecuta**: actualmente corre prueba t, ANOVA, correlaciones y regresión. *(Pendiente de implementar.)*
+- La regresión es **lineal simple** (una variable predictora); no hay regresión múltiple.
+- La prueba de normalidad es una **aproximación**, no el Shapiro-Wilk exacto.
+- No maneja valores faltantes de forma avanzada: las celdas no numéricas simplemente se excluyen del cálculo de cada columna.
 
 ---
 
-## Limitaciones
-
-- El análisis es **orientador**, no sustituto del juicio del investigador. Los resultados deben ser revisados, validados e interpretados por el investigador.
-- El motor de codificación usa búsqueda de términos en español. Corpus en otros idiomas requerirán adaptación.
-- Archivos muy extensos (más de 200.000 caracteres por fuente) se procesan parcialmente.
-- Los formatos aceptados son únicamente `.txt` y `.md`. Para documentos Word o PDF, exporta primero a texto plano.
-
----
-
-## Créditos
-
-Desarrollado como herramienta de apoyo a la investigación cualitativa.  
-Construido con HTML, CSS y JavaScript puro — sin frameworks, sin dependencias.  
-Tipografía: [Inter](https://fonts.google.com/specimen/Inter) + [Lora](https://fonts.google.com/specimen/Lora) vía Google Fonts.
-
----
-
-## Licencia
-
-MIT — libre para usar, modificar y distribuir con atribución.
+*AnalisisCuant · v1.0 — herramienta local de análisis cuantitativo.*
