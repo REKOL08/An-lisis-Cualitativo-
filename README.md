@@ -6,7 +6,7 @@
 
 AnalisisCuant is a single-page web app (HTML + JS) for running quantitative statistical analysis locally. Every calculation happens directly in your browser: your data never leaves your computer.
 
-![AnalisisCuant screenshot]([docs/screenshot.png])
+![AnalisisCuant screenshot](docs/screenshot.png)
 
 ---
 
