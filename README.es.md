@@ -6,7 +6,7 @@
 
 AnalisisCuant es una aplicación web de una sola página (HTML + JS) para realizar análisis estadístico cuantitativo de forma local. Todos los cálculos ocurren directamente en tu navegador: tus datos nunca salen de tu computador.
 
-![Captura de AnalisisCuant]([docs/screenshot.png](https://drive.google.com/file/d/1wUru9IVsCJAf3lNPhI0LY72LTRItooXZ/view?usp=sharing))
+![Captura de AnalisisCuant](docs/screenshot.png)
 
 ---
 
